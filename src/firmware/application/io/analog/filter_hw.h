@@ -192,7 +192,7 @@ namespace io::analog
             .FSR_MIN_VALUE               = 40,
             .FSR_MAX_VALUE               = 340,
             .AFTERTOUCH_MAX_VALUE        = 600,
-            .DIGITAL_VALUE_THRESHOLD_ON  = 1000,
+            .DIGITAL_VALUE_THRESHOLD_ON  = 800,
             .DIGITAL_VALUE_THRESHOLD_OFF = 600,
         };
 
