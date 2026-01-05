@@ -27,37 +27,28 @@ namespace io::buttons
         public:
         FilterHw() = default;
 
-        bool isFiltered(size_t index, uint8_t& numberOfReadings, uint16_t& states) override
+        /*
+            This filter makes use of the fact that the difference between digital readings is 1ms.
+            If the _debounceState is 0xFF or 0x00, the button is considered debounced. Since all bits
+            are used in a byte variable, and each reading takes 1ms, the debounce time is 8ms.
+        */
+        bool isFiltered(size_t index, bool& state) override
         {
-            /*
-                This filter makes use of the fact that the difference between digital readings is 1ms.
-                If the _debounceState is 0xFF or 0x00, the button is considered debounced. Since all bits
-                are used in a byte variable, and each reading takes 1ms, the debounce time is 8ms.
-
-                Technically, two readings are possible since maximum number of board readings is 16, and
-                full debounce cycle takes 8 readings. Assume the boards aren't that slow that the difference
-                between two calls of this function for the same button index is more than 8ms.
-             */
-
-            numberOfReadings = 1;
-
-            if (index >= Collection::SIZE(GROUP_DIGITAL_INPUTS))
+            if (index >= sizeof(_debounceState))
             {
-                // don't debounce analog inputs and touchscreen buttons
-                states = states & 0x01;
                 return true;
             }
 
-            _debounceState[index] <<= numberOfReadings;
-            _debounceState[index] |= static_cast<uint8_t>(states);
+            _debounceState[index] <<= 1;
+            _debounceState[index] |= static_cast<uint8_t>(state);
 
             if (_debounceState[index] == 0xFF)
             {
-                states = 1;
+                state = 1;
             }
             else if (_debounceState[index] == 0)
             {
-                states = 0;
+                state = 0;
             }
             else
             {
@@ -69,6 +60,7 @@ namespace io::buttons
         }
 
         private:
+        // don't debounce analog inputs and touchscreen buttons
         uint8_t _debounceState[Collection::SIZE(GROUP_DIGITAL_INPUTS)] = {};
     };
 }    // namespace io::buttons

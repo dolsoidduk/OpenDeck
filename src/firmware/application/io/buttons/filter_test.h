@@ -29,7 +29,7 @@ namespace io::buttons
         public:
         FilterTest() = default;
 
-        bool isFiltered(size_t index, uint8_t& numberOfReadings, uint16_t& states) override
+        bool isFiltered(size_t index, bool& state) override
         {
             return true;
         }

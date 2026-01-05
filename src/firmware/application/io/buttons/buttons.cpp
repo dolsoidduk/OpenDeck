@@ -134,14 +134,6 @@ void Buttons::updateSingle(size_t index, bool forceRefresh)
             return;
         }
 
-        // this filter will return amount of stable changed readings
-        // and the states of those readings
-        // latest reading is index 0
-        if (!_filter.isFiltered(index, numberOfReadings, states))
-        {
-            return;
-        }
-
         fillDescriptor(index, descriptor);
 
         for (uint8_t reading = 0; reading < numberOfReadings; reading++)
@@ -150,6 +142,11 @@ void Buttons::updateSingle(size_t index, bool forceRefresh)
             // start from oldest reading which is in upper bits
             uint8_t processIndex = numberOfReadings - 1 - reading;
             bool    state        = (states >> processIndex) & 0x01;
+
+            if (!_filter.isFiltered(index, state))
+            {
+                continue;
+            }
 
             processButton(index, state, descriptor);
         }

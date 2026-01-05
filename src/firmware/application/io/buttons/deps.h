@@ -49,6 +49,6 @@ namespace io::buttons
         public:
         virtual ~Filter() = default;
 
-        virtual bool isFiltered(size_t index, uint8_t& numberOfReadings, uint16_t& states) = 0;
+        virtual bool isFiltered(size_t index, bool& state) = 0;
     };
 }    // namespace io::buttons
