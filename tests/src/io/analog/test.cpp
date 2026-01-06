@@ -20,11 +20,12 @@ limitations under the License.
 
 #include "tests/common.h"
 #include "tests/helpers/listener.h"
-#include "application/io/analog/builder_test.h"
+#include "application/io/analog/builder.h"
 #include "application/io/buttons/buttons.h"
 #include "application/util/configurable/configurable.h"
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -33,10 +34,10 @@ namespace
         protected:
         void SetUp() override
         {
-            ASSERT_TRUE(_analog._databaseAdmin.init());
-            ASSERT_TRUE(_analog._databaseAdmin.factoryReset());
-            ASSERT_EQ(0, _analog._databaseAdmin.getPreset());
-            ASSERT_TRUE(_analog._databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.factoryReset());
+            ASSERT_EQ(0, _databaseAdmin.getPreset());
+            ASSERT_TRUE(_databaseAdmin.init());
             ASSERT_TRUE(_analog._instance.init());
 
             for (size_t i = 0; i < analog::Collection::SIZE(analog::GROUP_ANALOG_INPUTS); i++)
@@ -68,8 +69,10 @@ namespace
             _analog._instance.updateAll();
         }
 
-        test::Listener      _listener;
-        analog::BuilderTest _analog;
+        test::Listener    _listener;
+        database::Builder _builderDatabase;
+        database::Admin&  _databaseAdmin = _builderDatabase.instance();
+        analog::Builder   _analog        = analog::Builder(_databaseAdmin);
     };
 }    // namespace
 
@@ -440,10 +443,10 @@ TEST_F(AnalogTest, ButtonForwarding)
     ASSERT_TRUE(_analog._database.update(database::Config::Section::analog_t::TYPE, BUTTON_INDEX, analog::type_t::BUTTON) == true);
 
     // configure button with the same index (+offset) to certain parameters
-    ASSERT_TRUE(_analog._databaseAdmin.update(database::Config::Section::button_t::TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::type_t::MOMENTARY));
-    ASSERT_TRUE(_analog._databaseAdmin.update(database::Config::Section::button_t::CHANNEL, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, BUTTON_MIDI_CHANNEL));
-    ASSERT_TRUE(_analog._databaseAdmin.update(database::Config::Section::button_t::MESSAGE_TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::messageType_t::CONTROL_CHANGE_RESET));
-    ASSERT_TRUE(_analog._databaseAdmin.update(database::Config::Section::button_t::VALUE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, BUTTON_VELOCITY));
+    ASSERT_TRUE(_databaseAdmin.update(database::Config::Section::button_t::TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::type_t::MOMENTARY));
+    ASSERT_TRUE(_databaseAdmin.update(database::Config::Section::button_t::CHANNEL, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, BUTTON_MIDI_CHANNEL));
+    ASSERT_TRUE(_databaseAdmin.update(database::Config::Section::button_t::MESSAGE_TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::messageType_t::CONTROL_CHANGE_RESET));
+    ASSERT_TRUE(_databaseAdmin.update(database::Config::Section::button_t::VALUE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, BUTTON_VELOCITY));
 
     std::vector<messaging::Event> dispatchMessageAnalogFwd;
 
@@ -475,7 +478,7 @@ TEST_F(AnalogTest, ButtonForwarding)
     // similar test with the button message type being normal CC
     dispatchMessageAnalogFwd.clear();
 
-    ASSERT_TRUE(_analog._databaseAdmin.update(database::Config::Section::button_t::MESSAGE_TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::messageType_t::CONTROL_CHANGE));
+    ASSERT_TRUE(_databaseAdmin.update(database::Config::Section::button_t::MESSAGE_TYPE, buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS) + BUTTON_INDEX, buttons::messageType_t::CONTROL_CHANGE));
 
     stateChangeRegister(0xFFFF);
 

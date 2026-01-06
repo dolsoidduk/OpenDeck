@@ -24,10 +24,10 @@ limitations under the License.
 
 namespace database
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest() = default;
+        Builder() = default;
 
         Admin& instance()
         {

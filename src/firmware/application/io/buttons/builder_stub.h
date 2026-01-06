@@ -18,12 +18,32 @@ limitations under the License.
 
 #pragma once
 
-namespace io::touchscreen
+#include "buttons_stub.h"
+#include "filter_stub.h"
+#include "hwa_stub.h"
+#include "application/database/builder.h"
+
+namespace io::buttons
 {
-    class ModelsBuilder
+    class Builder
     {
         public:
-        ModelsBuilder(Hwa& hwa)
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwa, _filter, _database)
         {}
+
+        Buttons& instance()
+        {
+            return _instance;
+        }
+
+        private:
+        HwaStub    _hwa;
+        FilterStub _filter;
+
+        public:
+        Database _database;
+        Buttons  _instance;
     };
-}    // namespace io::touchscreen
+}    // namespace io::buttons

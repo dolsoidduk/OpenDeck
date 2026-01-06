@@ -28,7 +28,6 @@ namespace io::analog
         public:
         HwaHw() = default;
 
-#ifdef PROJECT_TARGET_SUPPORT_ADC
         bool value(size_t index, uint16_t& value) override
         {
             return board::io::analog::value(index, value);
@@ -39,6 +38,5 @@ namespace io::analog
             // only 10 and 12-bit ADC supported
             return CORE_MCU_ADC_MAX_VALUE == 1023 ? 10 : 12;
         }
-#endif
     };
 }    // namespace io::analog

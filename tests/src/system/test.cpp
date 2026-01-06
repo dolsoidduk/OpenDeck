@@ -21,10 +21,12 @@ limitations under the License.
 #include "tests/common.h"
 #include "tests/helpers/listener.h"
 #include "tests/helpers/midi.h"
-#include "application/system/builder_test.h"
+#include "application/system/builder.h"
 #include "application/util/configurable/configurable.h"
+#include "core/mcu.h"
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -98,7 +100,7 @@ namespace
         }
 
         test::Listener   _listener;
-        sys::BuilderTest _system;
+        sys::Builder     _system;
         test::MIDIHelper _helper = test::MIDIHelper(_system);
     };
 }    // namespace
@@ -300,7 +302,7 @@ TEST_F(SystemTest, ForcedResendOnPresetChange)
 #endif
 }
 
-#ifdef LEDS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_LEDS
 TEST_F(SystemTest, PresetChangeIndicatedOnLEDs)
 {
     if (leds::Collection::SIZE(leds::GROUP_DIGITAL_OUTPUTS) < 2)

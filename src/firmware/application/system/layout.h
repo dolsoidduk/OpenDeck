@@ -19,14 +19,13 @@ limitations under the License.
 #pragma once
 
 #include "custom_ids.h"
-#include "application/database/database.h"
-#include "application/io/buttons/buttons.h"
-#include "application/io/encoders/encoders.h"
-#include "application/io/analog/analog.h"
-#include "application/io/leds/leds.h"
-#include "application/io/i2c/peripherals/display/display.h"
-#include "application/io/touchscreen/touchscreen.h"
-#include "application/protocol/midi/midi.h"
+#include "application/io/buttons/common.h"
+#include "application/io/encoders/common.h"
+#include "application/io/analog/common.h"
+#include "application/io/leds/common.h"
+#include "application/io/i2c/peripherals/display/common.h"
+#include "application/io/touchscreen/common.h"
+#include "application/protocol/midi/common.h"
 
 #include "lib/sysexconf/sysexconf.h"
 

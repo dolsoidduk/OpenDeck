@@ -20,14 +20,17 @@ limitations under the License.
 
 #include "leds.h"
 #include "hwa_hw.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace io::leds
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwa, _database)
+        {}
 
         Leds& instance()
         {
@@ -35,8 +38,8 @@ namespace io::leds
         }
 
         private:
+        Database _database;
         HwaHw    _hwa;
-        Database _database = Database(database::BuilderHw::instance());
-        Leds     _instance = Leds(_hwa, _database);
+        Leds     _instance;
     };
 }    // namespace io::leds

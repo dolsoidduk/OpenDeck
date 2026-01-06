@@ -23,10 +23,10 @@ limitations under the License.
 
 namespace updater
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder() = default;
 
         Updater& instance()
         {

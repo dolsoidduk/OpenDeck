@@ -30,7 +30,6 @@ namespace io::touchscreen
         public:
         HwaHw() = default;
 
-#ifdef PROJECT_TARGET_SUPPORT_TOUCHSCREEN
         bool init() override
         {
             static constexpr uint32_t BAUDRATE = 38400;
@@ -60,6 +59,5 @@ namespace io::touchscreen
             return false;
 #endif
         }
-#endif
     };
 }    // namespace io::touchscreen

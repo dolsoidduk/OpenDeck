@@ -21,14 +21,17 @@ limitations under the License.
 #include "encoders.h"
 #include "filter_hw.h"
 #include "hwa_hw.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace io::encoders
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwa, _filter, _database)
+        {}
 
         Encoders& instance()
         {
@@ -36,9 +39,9 @@ namespace io::encoders
         }
 
         private:
+        Database _database;
         HwaHw    _hwa;
         FilterHw _filter;
-        Database _database = Database(database::BuilderHw::instance());
-        Encoders _instance = Encoders(_hwa, _filter, _database);
+        Encoders _instance;
     };
 }    // namespace io::encoders

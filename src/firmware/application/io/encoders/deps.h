@@ -33,10 +33,7 @@ namespace io::encoders
         virtual ~Hwa() = default;
 
         // should return true if the value has been refreshed, false otherwise
-        virtual bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states)
-        {
-            return false;
-        }
+        virtual bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states) = 0;
     };
 
     class Filter

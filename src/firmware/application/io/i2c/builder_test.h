@@ -20,28 +20,20 @@ limitations under the License.
 
 #include "i2c.h"
 #include "hwa_test.h"
-#include "peripherals/builder.h"
 #include "application/database/builder_test.h"
 
 namespace io::i2c
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _peripherals(_hwa, _databaseAdmin)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
-            : _peripherals(_hwa, database)
+        Builder(database::Admin& database)
+            : _database(database)
         {}
 
         HwaTest _hwa;
 
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        PeripheralsBuilder    _peripherals   = PeripheralsBuilder(_hwa, _databaseAdmin);
-        I2c                   _instance;
+        database::Admin _database;
+        I2c             _instance;
     };
 }    // namespace io::i2c

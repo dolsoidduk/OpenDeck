@@ -19,7 +19,7 @@ limitations under the License.
 #pragma once
 
 #include "misc.h"
-#include "application/system/builder_test.h"
+#include "application/system/builder.h"
 #include "application/protocol/midi/midi.h"
 #include "lib/sysexconf/sysexconf.h"
 #include "application/util/conversion/conversion.h"
@@ -39,8 +39,6 @@ limitations under the License.
 #include <iostream>
 #include <fstream>
 
-using namespace protocol;
-
 namespace test
 {
     class MIDIHelper
@@ -54,22 +52,22 @@ namespace test
             : USE_HARDWARE(useHardware)
         {}
 
-        MIDIHelper(sys::BuilderTest& system)
+        MIDIHelper(sys::Builder& system)
             : _system(&system)
             , USE_HARDWARE(false)
         {}
 
-        std::vector<midi::UsbPacket> rawSysExToUSBPackets(std::vector<uint8_t>& raw)
+        std::vector<protocol::midi::UsbPacket> rawSysExToUSBPackets(std::vector<uint8_t>& raw)
         {
             messaging::Event event = {};
             event.sysEx            = &raw[0];
             event.sysExLength      = raw.size();
-            event.message          = midi::messageType_t::SYS_EX;
+            event.message          = protocol::midi::messageType_t::SYS_EX;
 
             return midiToUsbPackets(event);
         }
 
-        std::vector<midi::UsbPacket> midiToUsbPackets(messaging::Event event)
+        std::vector<protocol::midi::UsbPacket> midiToUsbPackets(messaging::Event event)
         {
             class HWAWriteToUSB : public lib::midi::usb::Hwa
             {
@@ -86,18 +84,18 @@ namespace test
                     return true;
                 }
 
-                bool read(midi::UsbPacket& packet) override
+                bool read(protocol::midi::UsbPacket& packet) override
                 {
                     return false;
                 }
 
-                bool write(midi::UsbPacket& packet) override
+                bool write(protocol::midi::UsbPacket& packet) override
                 {
                     _buffer.push_back(packet);
                     return true;
                 }
 
-                std::vector<midi::UsbPacket> _buffer;
+                std::vector<protocol::midi::UsbPacket> _buffer;
             } hwaWriteToUSB;
 
             lib::midi::usb::Usb writeToUsb(hwaWriteToUSB);
@@ -105,133 +103,133 @@ namespace test
 
             switch (event.message)
             {
-            case midi::messageType_t::NOTE_OFF:
+            case protocol::midi::messageType_t::NOTE_OFF:
             {
                 writeToUsb.sendNoteOff(event.index, event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::NOTE_ON:
+            case protocol::midi::messageType_t::NOTE_ON:
             {
                 writeToUsb.sendNoteOff(event.index, event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::CONTROL_CHANGE:
+            case protocol::midi::messageType_t::CONTROL_CHANGE:
             {
                 writeToUsb.sendControlChange(event.index, event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::PROGRAM_CHANGE:
+            case protocol::midi::messageType_t::PROGRAM_CHANGE:
             {
                 writeToUsb.sendProgramChange(event.index, event.channel);
             }
             break;
 
-            case midi::messageType_t::AFTER_TOUCH_CHANNEL:
+            case protocol::midi::messageType_t::AFTER_TOUCH_CHANNEL:
             {
                 writeToUsb.sendAfterTouch(event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::AFTER_TOUCH_POLY:
+            case protocol::midi::messageType_t::AFTER_TOUCH_POLY:
             {
                 writeToUsb.sendAfterTouch(event.value, event.channel, event.index);
             }
             break;
 
-            case midi::messageType_t::PITCH_BEND:
+            case protocol::midi::messageType_t::PITCH_BEND:
             {
                 writeToUsb.sendPitchBend(event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_CLOCK:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_CLOCK:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_START:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_START:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_CONTINUE:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_CONTINUE:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_STOP:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_STOP:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_ACTIVE_SENSING:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_ACTIVE_SENSING:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::SYS_REAL_TIME_SYSTEM_RESET:
+            case protocol::midi::messageType_t::SYS_REAL_TIME_SYSTEM_RESET:
             {
                 writeToUsb.sendRealTime(event.message);
             }
             break;
 
-            case midi::messageType_t::MMC_PLAY:
+            case protocol::midi::messageType_t::MMC_PLAY:
             {
                 writeToUsb.sendMMC(event.index, event.message);
             }
             break;
 
-            case midi::messageType_t::MMC_STOP:
+            case protocol::midi::messageType_t::MMC_STOP:
             {
                 writeToUsb.sendMMC(event.index, event.message);
             }
             break;
 
-            case midi::messageType_t::MMC_PAUSE:
+            case protocol::midi::messageType_t::MMC_PAUSE:
             {
                 writeToUsb.sendMMC(event.index, event.message);
             }
             break;
 
-            case midi::messageType_t::MMC_RECORD_START:
+            case protocol::midi::messageType_t::MMC_RECORD_START:
             {
                 writeToUsb.sendMMC(event.index, event.message);
             }
             break;
 
-            case midi::messageType_t::MMC_RECORD_STOP:
+            case protocol::midi::messageType_t::MMC_RECORD_STOP:
             {
                 writeToUsb.sendMMC(event.index, event.message);
             }
             break;
 
-            case midi::messageType_t::NRPN_7BIT:
+            case protocol::midi::messageType_t::NRPN_7BIT:
             {
                 writeToUsb.sendNRPN(event.index, event.value, event.channel, false);
             }
             break;
 
-            case midi::messageType_t::NRPN_14BIT:
+            case protocol::midi::messageType_t::NRPN_14BIT:
             {
                 writeToUsb.sendNRPN(event.index, event.value, event.channel, true);
             }
             break;
 
-            case midi::messageType_t::CONTROL_CHANGE_14BIT:
+            case protocol::midi::messageType_t::CONTROL_CHANGE_14BIT:
             {
                 writeToUsb.sendControlChange14bit(event.index, event.value, event.channel);
             }
             break;
 
-            case midi::messageType_t::SYS_EX:
+            case protocol::midi::messageType_t::SYS_EX:
             {
                 writeToUsb.sendSysEx(event.sysExLength, event.sysEx, true);
             }
@@ -534,7 +532,7 @@ namespace test
             messaging::Event event = {};
             event.sysEx            = &request[0];
             event.sysExLength      = request.size();
-            event.message          = midi::messageType_t::SYS_EX;
+            event.message          = protocol::midi::messageType_t::SYS_EX;
 
             processIncoming(event);
 
@@ -699,7 +697,7 @@ namespace test
             return sys::Config::block_t::TOUCHSCREEN;
         }
 
-        sys::BuilderTest* _system = nullptr;
+        sys::Builder* _system = nullptr;
 
         [[maybe_unused]] const bool USE_HARDWARE;
     };

@@ -20,30 +20,20 @@ limitations under the License.
 
 #include "touchscreen.h"
 #include "hwa_test.h"
-#include "models/builder.h"
 #include "application/database/builder_test.h"
 
 namespace io::touchscreen
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _database(_databaseAdmin)
-            , _instance(_hwa, _database)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
+        Builder(database::Admin& database)
             : _database(database)
             , _instance(_hwa, _database)
         {}
 
-        HwaTest               _hwa;
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        Database              _database;
-        ModelsBuilder         _models = ModelsBuilder(_hwa);
-        Touchscreen           _instance;
+        HwaTest     _hwa;
+        Database    _database;
+        Touchscreen _instance;
     };
 }    // namespace io::touchscreen

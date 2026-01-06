@@ -19,9 +19,10 @@ limitations under the License.
 #ifndef PROJECT_TARGET_USB_OVER_SERIAL_HOST
 
 #include "tests/common.h"
-#include "application/protocol/midi/builder_test.h"
+#include "application/protocol/midi/builder.h"
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -30,7 +31,7 @@ namespace
         protected:
         void SetUp() override
         {
-            ASSERT_TRUE(_midi._databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.init());
 
             EXPECT_CALL(_midi._hwaSerial, setLoopback(false))
                 .WillOnce(Return(true));
@@ -42,7 +43,9 @@ namespace
         {
         }
 
-        protocol::midi::BuilderTest _midi;
+        database::Builder       _builderDatabase;
+        database::Admin&        _databaseAdmin = _builderDatabase.instance();
+        protocol::midi::Builder _midi          = protocol::midi::Builder(_databaseAdmin);
     };
 }    // namespace
 

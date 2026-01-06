@@ -22,9 +22,9 @@ limitations under the License.
 
 #define USB_VENDOR_ID 0x1209
 
-#if defined(FW_APP)
+#if defined(OPENDECK_FW_APP)
 #define USB_PRODUCT_ID 0x8472
-#elif defined(FW_BOOT)
+#elif defined(OPENDECK_FW_BOOT)
 #define USB_PRODUCT_ID 0x8473
 #endif
 

@@ -33,15 +33,8 @@ namespace io::buttons
         virtual ~Hwa() = default;
 
         // should return true if the value has been refreshed, false otherwise
-        virtual bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states)
-        {
-            return false;
-        }
-
-        virtual size_t buttonToEncoderIndex(size_t index)
-        {
-            return 0;
-        }
+        virtual bool   state(size_t index, uint8_t& numberOfReadings, uint16_t& states) = 0;
+        virtual size_t buttonToEncoderIndex(size_t index)                               = 0;
     };
 
     class Filter

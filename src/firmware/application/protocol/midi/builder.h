@@ -18,29 +18,8 @@ limitations under the License.
 
 #pragma once
 
-namespace io::i2c
-{
-    class I2c : public io::Base
-    {
-        public:
-        I2c() = default;
-
-        bool init() override
-        {
-            return false;
-        }
-
-        void updateSingle(size_t index, bool forceRefresh = false) override
-        {
-        }
-
-        void updateAll(bool forceRefresh = false) override
-        {
-        }
-
-        size_t maxComponentUpdateIndex() override
-        {
-            return 0;
-        }
-    };
-}    // namespace io::i2c
+#ifdef OPENDECK_TEST
+#include "application/protocol/midi/builder_test.h"
+#else
+#include "application/protocol/midi/builder_hw.h"
+#endif

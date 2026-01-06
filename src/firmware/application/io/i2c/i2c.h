@@ -25,8 +25,6 @@ limitations under the License.
 
 #include <array>
 
-#ifdef PROJECT_TARGET_SUPPORT_I2C
-
 namespace io::i2c
 {
     class I2c : public io::Base
@@ -48,7 +46,3 @@ namespace io::i2c
         static std::array<Peripheral*, MAX_PERIPHERALS> _peripherals;
     };
 }    // namespace io::i2c
-
-#else
-#include "stub.h"
-#endif

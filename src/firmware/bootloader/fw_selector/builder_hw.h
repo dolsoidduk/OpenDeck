@@ -23,10 +23,10 @@ limitations under the License.
 
 namespace fw_selector
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder() = default;
 
         FwSelector& instance()
         {

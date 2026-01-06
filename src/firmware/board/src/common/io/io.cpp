@@ -30,7 +30,7 @@ namespace board::detail::io
 
         // initialize the rest of IO only for app
 
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
         analog::init();
         digital_in::init();
         digital_out::init();

@@ -18,7 +18,7 @@ limitations under the License.
 
 #pragma once
 
-#include "application/io/touchscreen/touchscreen.h"
+#include "application/io/touchscreen/deps.h"
 
 #include "core/util/ring_buffer.h"
 

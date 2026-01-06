@@ -25,25 +25,17 @@ limitations under the License.
 
 namespace io::buttons
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _database(_databaseAdmin)
-            , _instance(_hwa, _filter, _database)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
+        Builder(database::Admin& database)
             : _database(database)
             , _instance(_hwa, _filter, _database)
         {}
 
-        HwaTest               _hwa;
-        FilterTest            _filter;
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        Database              _database;
-        Buttons               _instance;
+        HwaTest    _hwa;
+        FilterTest _filter;
+        Database   _database;
+        Buttons    _instance;
     };
 }    // namespace io::buttons

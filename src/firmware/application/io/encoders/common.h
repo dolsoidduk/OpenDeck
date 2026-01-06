@@ -18,10 +18,16 @@ limitations under the License.
 
 #pragma once
 
-#include <inttypes.h>
+#include "application/io/common/common.h"
 
 namespace io::encoders
 {
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS / 2>
+    {
+        public:
+        Collection() = delete;
+    };
+
     enum class type_t : uint8_t
     {
         CONTROL_CHANGE_7FH01H,

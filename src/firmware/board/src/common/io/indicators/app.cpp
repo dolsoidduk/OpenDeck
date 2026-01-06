@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 #ifdef PROJECT_TARGET_SUPPORT_LED_INDICATORS
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 
 #include "indicators.h"
 #include "board/board.h"

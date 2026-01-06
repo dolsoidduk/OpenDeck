@@ -20,6 +20,7 @@ limitations under the License.
 
 #include "display.h"
 
+#include "application/io/i2c/i2c.h"
 #include "application/protocol/midi/midi.h"
 #include "application/io/common/common.h"
 #include "application/util/conversion/conversion.h"

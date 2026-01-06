@@ -26,6 +26,7 @@ limitations under the License.
 #include "core/util/util.h"
 
 using namespace io::analog;
+using namespace protocol;
 
 Analog::Analog(Hwa&      hwa,
                Filter&   filter,

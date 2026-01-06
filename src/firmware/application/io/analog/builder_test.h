@@ -25,25 +25,17 @@ limitations under the License.
 
 namespace io::analog
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _database(_databaseAdmin)
-            , _instance(_hwa, _filter, _database)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
+        Builder(database::Admin& database)
             : _database(database)
             , _instance(_hwa, _filter, _database)
         {}
 
-        HwaTest               _hwa;
-        FilterTest            _filter;
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        Database              _database;
-        Analog                _instance;
+        Database   _database;
+        HwaTest    _hwa;
+        FilterTest _filter;
+        Analog     _instance;
     };
 }    // namespace io::analog

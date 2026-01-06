@@ -18,12 +18,13 @@ limitations under the License.
 
 #include "tests/common.h"
 #include "tests/helpers/listener.h"
-#include "application/io/buttons/builder_test.h"
+#include "application/io/buttons/builder.h"
 #include "application/util/configurable/configurable.h"
 
-#ifdef BUTTONS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_BUTTONS
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -32,10 +33,10 @@ namespace
         protected:
         void SetUp() override
         {
-            ASSERT_TRUE(_buttons._databaseAdmin.init());
-            ASSERT_TRUE(_buttons._databaseAdmin.factoryReset());
-            ASSERT_EQ(0, _buttons._databaseAdmin.getPreset());
-            ASSERT_TRUE(_buttons._databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.factoryReset());
+            ASSERT_EQ(0, _databaseAdmin.getPreset());
+            ASSERT_TRUE(_databaseAdmin.init());
 
             for (size_t i = 0; i < buttons::Collection::SIZE(buttons::GROUP_DIGITAL_INPUTS); i++)
             {
@@ -84,8 +85,10 @@ namespace
             _buttons._instance.updateSingle(index);
         }
 
-        test::Listener       _listener;
-        buttons::BuilderTest _buttons;
+        test::Listener    _listener;
+        database::Builder _builderDatabase;
+        database::Admin&  _databaseAdmin = _builderDatabase.instance();
+        buttons::Builder  _buttons       = buttons::Builder(_databaseAdmin);
     };
 }    // namespace
 
@@ -240,7 +243,7 @@ TEST_F(ButtonsTest, ProgramChange)
     }
 
     // test PROGRAM_CHANGE_INC/PROGRAM_CHANGE_DEC
-    _buttons._databaseAdmin.factoryReset();
+    _databaseAdmin.factoryReset();
     stateChangeRegisterAll(false);
 
     auto configurePCbutton = [&](size_t index, uint8_t channel, bool increase)
@@ -288,7 +291,7 @@ TEST_F(ButtonsTest, ProgramChange)
     stateChangeRegisterAll(false);
 
     // now, revert all buttons back to default
-    _buttons._databaseAdmin.factoryReset();
+    _databaseAdmin.factoryReset();
 
     if (buttons::Collection::SIZE(io::buttons::GROUP_DIGITAL_INPUTS) < 4)
     {
@@ -330,7 +333,7 @@ TEST_F(ButtonsTest, ProgramChange)
     stateChangeRegisterAll(false);
 
     // revert to default again
-    _buttons._databaseAdmin.factoryReset();
+    _databaseAdmin.factoryReset();
 
     // now configure button 0 for PROGRAM_CHANGE_DEC
     configurePCbutton(0, CHANNEL, false);
@@ -396,7 +399,7 @@ TEST_F(ButtonsTest, ProgramChange)
     stateChangeRegisterAll(false);
 
     // revert all buttons to default
-    _buttons._databaseAdmin.factoryReset();
+    _databaseAdmin.factoryReset();
 
     configurePCbutton(0, CHANNEL, true);
 
@@ -673,7 +676,7 @@ TEST_F(ButtonsTest, NoMessages)
 
 TEST_F(ButtonsTest, PresetChange)
 {
-    if (_buttons._databaseAdmin.getSupportedPresets() <= 1)
+    if (_databaseAdmin.getSupportedPresets() <= 1)
     {
         return;
     }

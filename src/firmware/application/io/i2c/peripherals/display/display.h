@@ -23,15 +23,12 @@ limitations under the License.
 #include "strings.h"
 #include "application/messaging/messaging.h"
 #include "application/system/config.h"
-#include "application/io/i2c/i2c.h"
 
 #include "core/util/util.h"
 #include <u8x8.h>
 
 #include <bits/char_traits.h>
 #include <optional>
-
-using namespace protocol;
 
 namespace io::i2c::display
 {
@@ -111,7 +108,7 @@ namespace io::i2c::display
                     MidiDispatcher.listen(messaging::eventType_t::MIDI_IN,
                                           [this](const messaging::Event& event)
                                           {
-                                              if (event.message != midi::messageType_t::SYS_EX)
+                                              if (event.message != protocol::midi::messageType_t::SYS_EX)
                                               {
                                                   setText("%s", Strings::MIDI_MESSAGE(event.message));
                                               }
@@ -128,7 +125,7 @@ namespace io::i2c::display
                     MidiDispatcher.listen(messaging::eventType_t::MIDI_IN,
                                           [this](const messaging::Event& event)
                                           {
-                                              if (event.message != midi::messageType_t::SYS_EX)
+                                              if (event.message != protocol::midi::messageType_t::SYS_EX)
                                               {
                                                   _midiUpdater.updateMIDIValue(*this, event);
                                               }

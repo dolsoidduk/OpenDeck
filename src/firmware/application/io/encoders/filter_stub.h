@@ -18,37 +18,28 @@ limitations under the License.
 
 #pragma once
 
+#include "deps.h"
+
 namespace io::encoders
 {
-    class Collection : public common::BaseCollection<0>
+    class FilterStub : public Filter
     {
         public:
-        Collection() = delete;
-    };
+        FilterStub() = default;
 
-    class Encoders : public io::Base
-    {
-        public:
-        Encoders(Hwa&      hwa,
-                 Filter&   filter,
-                 Database& database,
-                 uint32_t  timeDiffTimeout = 1)
-        {}
-
-        bool init() override
+        bool isFiltered(size_t      index,
+                        position_t  position,
+                        position_t& filteredPosition,
+                        uint32_t    sampleTakenTime) override
         {
             return false;
         }
 
-        void updateSingle(size_t index, bool forceRefresh = false) override
+        void reset(size_t index) override
         {
         }
 
-        void updateAll(bool forceRefresh = false) override
-        {
-        }
-
-        size_t maxComponentUpdateIndex() override
+        uint32_t lastMovementTime(size_t index) override
         {
             return 0;
         }

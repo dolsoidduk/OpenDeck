@@ -38,7 +38,7 @@ target_compile_definitions(board_application
     ${PROJECT_TARGET_DEFINES}
     ${PROJECT_USB_DEFINES}
     ${BOARD_DEFINES}
-    FW_APP
+    OPENDECK_FW_APP
 )
 
 target_sources(board_application
@@ -115,7 +115,7 @@ if("PROJECT_MCU_SUPPORT_BOOTLOADER" IN_LIST PROJECT_MCU_DEFINES)
         ${PROJECT_TARGET_DEFINES}
         ${PROJECT_USB_DEFINES}
         ${BOARD_DEFINES}
-        FW_BOOT
+        OPENDECK_FW_BOOT
     )
 
     target_sources(board_bootloader

@@ -20,8 +20,8 @@ limitations under the License.
 
 #include "core/util/logger.h"
 
-#ifdef APP_USE_LOGGER
-#ifdef FW_APP
+#ifdef OPENDECK_USE_LOGGER
+#ifdef OPENDECK_FW_APP
 constexpr inline size_t APP_LOGGER_SIZE = 128;
 CORE_LOGGER_DECLARE(APP_LOGGER, APP_LOGGER_SIZE);
 

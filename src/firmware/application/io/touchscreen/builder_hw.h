@@ -21,14 +21,18 @@ limitations under the License.
 #include "touchscreen.h"
 #include "hwa_hw.h"
 #include "models/builder.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace io::touchscreen
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _models(_hwa)
+            , _instance(_hwa, _database)
+        {}
 
         Touchscreen& instance()
         {
@@ -36,9 +40,9 @@ namespace io::touchscreen
         }
 
         private:
+        Database      _database;
         HwaHw         _hwa;
-        Database      _database = Database(database::BuilderHw::instance());
-        ModelsBuilder _models   = ModelsBuilder(_hwa);
-        Touchscreen   _instance = Touchscreen(_hwa, _database);
+        ModelsBuilder _models;
+        Touchscreen   _instance;
     };
 }    // namespace io::touchscreen

@@ -26,21 +26,8 @@ limitations under the License.
 
 #include <optional>
 
-using namespace protocol;
-
-#if defined(PROJECT_TARGET_SUPPORT_DIGITAL_INPUTS) || defined(PROJECT_TARGET_SUPPORT_TOUCHSCREEN) || defined(PROJECT_TARGET_SUPPORT_ADC)
-#define BUTTONS_SUPPORTED
-
 namespace io::buttons
 {
-    class Collection : public common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS,
-                                                     PROJECT_TARGET_SUPPORTED_NR_OF_ANALOG_INPUTS,
-                                                     PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Buttons : public io::Base
     {
         public:
@@ -62,39 +49,39 @@ namespace io::buttons
             messaging::Event event       = {};
         };
 
-        using ValueIncDecMIDI7Bit = util::IncDec<uint8_t, 0, midi::MAX_VALUE_7BIT>;
+        using ValueIncDecMIDI7Bit = util::IncDec<uint8_t, 0, protocol::midi::MAX_VALUE_7BIT>;
 
-        static constexpr std::array<midi::messageType_t, static_cast<uint8_t>(messageType_t::AMOUNT)> INTERNAL_MSG_TO_MIDI_TYPE = {
-            midi::messageType_t::NOTE_ON,                         // NOTE
-            midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE
-            midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE
-            midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE_RESET
-            midi::messageType_t::MMC_STOP,                        // MMC_STOP
-            midi::messageType_t::MMC_PLAY,                        // MMC_PLAY
-            midi::messageType_t::MMC_RECORD_START,                // MMC_RECORD - modified to stop when needed
-            midi::messageType_t::MMC_PAUSE,                       // MMC_PAUSE
-            midi::messageType_t::SYS_REAL_TIME_CLOCK,             // REAL_TIME_CLOCK
-            midi::messageType_t::SYS_REAL_TIME_START,             // REAL_TIME_START
-            midi::messageType_t::SYS_REAL_TIME_CONTINUE,          // REAL_TIME_CONTINUE
-            midi::messageType_t::SYS_REAL_TIME_STOP,              // REAL_TIME_STOP
-            midi::messageType_t::SYS_REAL_TIME_ACTIVE_SENSING,    // REAL_TIME_ACTIVE_SENSING
-            midi::messageType_t::SYS_REAL_TIME_SYSTEM_RESET,      // REAL_TIME_SYSTEM_RESET
-            midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE_INC
-            midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE_DEC
-            midi::messageType_t::INVALID,                         // NONE
-            midi::messageType_t::INVALID,                         // PRESET_CHANGE
-            midi::messageType_t::NOTE_ON,                         // MULTI_VAL_INC_RESET_NOTE
-            midi::messageType_t::NOTE_ON,                         // MULTI_VAL_INC_DEC_NOTE
-            midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_RESET_CC
-            midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_DEC_CC
-            midi::messageType_t::NOTE_ON,                         // NOTE_OFF_ONLY
-            midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE0_ONLY
-            midi::messageType_t::INVALID,                         // RESERVED
-            midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_INC
-            midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_DEC
-            midi::messageType_t::INVALID,                         // BPM_INC
-            midi::messageType_t::INVALID,                         // BPM_DEC
-            midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
+        static constexpr std::array<protocol::midi::messageType_t, static_cast<uint8_t>(messageType_t::AMOUNT)> INTERNAL_MSG_TO_MIDI_TYPE = {
+            protocol::midi::messageType_t::NOTE_ON,                         // NOTE
+            protocol::midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE
+            protocol::midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE
+            protocol::midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE_RESET
+            protocol::midi::messageType_t::MMC_STOP,                        // MMC_STOP
+            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY
+            protocol::midi::messageType_t::MMC_RECORD_START,                // MMC_RECORD - modified to stop when needed
+            protocol::midi::messageType_t::MMC_PAUSE,                       // MMC_PAUSE
+            protocol::midi::messageType_t::SYS_REAL_TIME_CLOCK,             // REAL_TIME_CLOCK
+            protocol::midi::messageType_t::SYS_REAL_TIME_START,             // REAL_TIME_START
+            protocol::midi::messageType_t::SYS_REAL_TIME_CONTINUE,          // REAL_TIME_CONTINUE
+            protocol::midi::messageType_t::SYS_REAL_TIME_STOP,              // REAL_TIME_STOP
+            protocol::midi::messageType_t::SYS_REAL_TIME_ACTIVE_SENSING,    // REAL_TIME_ACTIVE_SENSING
+            protocol::midi::messageType_t::SYS_REAL_TIME_SYSTEM_RESET,      // REAL_TIME_SYSTEM_RESET
+            protocol::midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE_INC
+            protocol::midi::messageType_t::PROGRAM_CHANGE,                  // PROGRAM_CHANGE_DEC
+            protocol::midi::messageType_t::INVALID,                         // NONE
+            protocol::midi::messageType_t::INVALID,                         // PRESET_CHANGE
+            protocol::midi::messageType_t::NOTE_ON,                         // MULTI_VAL_INC_RESET_NOTE
+            protocol::midi::messageType_t::NOTE_ON,                         // MULTI_VAL_INC_DEC_NOTE
+            protocol::midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_RESET_CC
+            protocol::midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_DEC_CC
+            protocol::midi::messageType_t::NOTE_ON,                         // NOTE_OFF_ONLY
+            protocol::midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE0_ONLY
+            protocol::midi::messageType_t::INVALID,                         // RESERVED
+            protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_INC
+            protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_DEC
+            protocol::midi::messageType_t::INVALID,                         // BPM_INC
+            protocol::midi::messageType_t::INVALID,                         // BPM_DEC
+            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
         };
 
         Hwa&      _hwa;
@@ -116,7 +103,3 @@ namespace io::buttons
         std::optional<uint8_t> sysConfigSet(sys::Config::Section::button_t section, size_t index, uint16_t value);
     };
 }    // namespace io::buttons
-
-#else
-#include "stub.h"
-#endif

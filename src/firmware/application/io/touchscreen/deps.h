@@ -32,25 +32,10 @@ namespace io::touchscreen
         public:
         virtual ~Hwa() = default;
 
-        virtual bool init()
-        {
-            return false;
-        }
-
-        virtual bool deInit()
-        {
-            return false;
-        }
-
-        virtual bool write(uint8_t value)
-        {
-            return false;
-        }
-
-        virtual bool read(uint8_t& value)
-        {
-            return false;
-        }
+        virtual bool init()               = 0;
+        virtual bool deInit()             = 0;
+        virtual bool write(uint8_t value) = 0;
+        virtual bool read(uint8_t& value) = 0;
 
         bool allocated(io::common::Allocatable::interface_t interface) override
         {

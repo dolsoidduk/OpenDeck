@@ -20,21 +20,21 @@ limitations under the License.
 
 #include "system.h"
 #include "hwa_test.h"
-#include "application/io/analog/builder_test.h"
-#include "application/io/buttons/builder_test.h"
-#include "application/io/encoders/builder_test.h"
-#include "application/io/touchscreen/builder_test.h"
-#include "application/io/i2c/builder_test.h"
-#include "application/io/leds/builder_test.h"
-#include "application/database/builder_test.h"
-#include "application/protocol/midi/builder_test.h"
+#include "application/database/builder.h"
+#include "application/protocol/midi/builder.h"
+#include "application/io/analog/builder.h"
+#include "application/io/buttons/builder.h"
+#include "application/io/encoders/builder.h"
+#include "application/io/touchscreen/builder.h"
+#include "application/io/i2c/builder.h"
+#include "application/io/leds/builder.h"
 
 namespace sys
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest() = default;
+        Builder() = default;
 
         class ComponentsTest : public Components
         {
@@ -65,15 +65,15 @@ namespace sys
                 return _database;
             }
 
-            database::BuilderTest                                                          _builderDatabase;
-            database::Admin&                                                               _database           = _builderDatabase._instance;
-            io::analog::BuilderTest                                                        _builderAnalog      = io::analog::BuilderTest(_database);
-            io::encoders::BuilderTest                                                      _builderEncoders    = io::encoders::BuilderTest(_database);
-            io::leds::BuilderTest                                                          _builderLeds        = io::leds::BuilderTest(_database);
-            io::buttons::BuilderTest                                                       _builderButtons     = io::buttons::BuilderTest(_database);
-            io::touchscreen::BuilderTest                                                   _builderTouchscreen = io::touchscreen::BuilderTest(_database);
-            io::i2c::BuilderTest                                                           _builderI2c         = io::i2c::BuilderTest(_database);
-            protocol::midi::BuilderTest                                                    _builderMidi        = protocol::midi::BuilderTest(_database);
+            database::Builder                                                              _builderDatabase;
+            database::Admin&                                                               _database           = _builderDatabase.instance();
+            io::analog::Builder                                                            _builderAnalog      = io::analog::Builder(_database);
+            io::encoders::Builder                                                          _builderEncoders    = io::encoders::Builder(_database);
+            io::leds::Builder                                                              _builderLeds        = io::leds::Builder(_database);
+            io::buttons::Builder                                                           _builderButtons     = io::buttons::Builder(_database);
+            io::touchscreen::Builder                                                       _builderTouchscreen = io::touchscreen::Builder(_database);
+            io::i2c::Builder                                                               _builderI2c         = io::i2c::Builder(_database);
+            protocol::midi::Builder                                                        _builderMidi        = protocol::midi::Builder(_database);
             std::array<io::Base*, static_cast<size_t>(io::ioComponent_t::AMOUNT)>          _io                 = {};
             std::array<protocol::Base*, static_cast<size_t>(protocol::protocol_t::AMOUNT)> _protocol           = {};
         };

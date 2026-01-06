@@ -18,12 +18,20 @@ limitations under the License.
 
 #pragma once
 
-namespace io::i2c
-{
-    class PeripheralsBuilder
-    {
-        public:
-        PeripheralsBuilder(Hwa& hwa, database::Admin& database)
-        {}
-    };
-}    // namespace io::i2c
+// clang-format off
+
+#ifdef OPENDECK_TEST
+    #ifdef PROJECT_TARGET_SUPPORT_BUTTONS
+        #include "application/io/buttons/builder_test.h"
+    #else
+        #include "application/io/buttons/builder_stub.h"
+    #endif
+#else
+    #ifdef PROJECT_TARGET_SUPPORT_BUTTONS
+        #include "application/io/buttons/builder_hw.h"
+    #else
+        #include "application/io/buttons/builder_stub.h"
+    #endif
+#endif
+
+// clang-format on

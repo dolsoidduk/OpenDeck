@@ -22,7 +22,7 @@ limitations under the License.
 #include "tests/common.h"
 #include "tests/helpers/midi.h"
 #include "sysex_parser/sysex_parser.h"
-#include "bootloader/updater/builder_test.h"
+#include "bootloader/updater/builder.h"
 
 #include <filesystem>
 #include <iostream>
@@ -33,6 +33,8 @@ limitations under the License.
 #include <string>
 #include <cstddef>
 
+using namespace protocol;
+
 namespace
 {
     const std::string fw_build_type_subdir = "release/";
@@ -40,7 +42,7 @@ namespace
     const std::string FW_UPDATE_FILE_BIN   = "firmware.bin";
 
     sysex_parser::SysExParser sysExParser;
-    updater::BuilderTest      builderUpdater;
+    updater::Builder          builderUpdater;
     test::MIDIHelper          helper;
 }    // namespace
 

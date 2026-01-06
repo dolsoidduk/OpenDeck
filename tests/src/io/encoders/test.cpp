@@ -18,12 +18,13 @@ limitations under the License.
 
 #include "tests/common.h"
 #include "tests/helpers/listener.h"
-#include "application/io/encoders/builder_test.h"
+#include "application/io/encoders/builder.h"
 #include "application/util/configurable/configurable.h"
 
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -32,9 +33,9 @@ namespace
         protected:
         void SetUp() override
         {
-            ASSERT_TRUE(_encoders._databaseAdmin.init());
-            ASSERT_TRUE(_encoders._databaseAdmin.factoryReset());
-            ASSERT_EQ(0, _encoders._databaseAdmin.getPreset());
+            ASSERT_TRUE(_databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.factoryReset());
+            ASSERT_EQ(0, _databaseAdmin.getPreset());
 
             // set known state
             for (size_t i = 0; i < encoders::Collection::SIZE(); i++)
@@ -78,8 +79,10 @@ namespace
             0b01
         };
 
-        test::Listener        _listener;
-        encoders::BuilderTest _encoders;
+        test::Listener    _listener;
+        database::Builder _builderDatabase;
+        database::Admin&  _databaseAdmin = _builderDatabase.instance();
+        encoders::Builder _encoders      = encoders::Builder(_databaseAdmin);
     };
 }    // namespace
 

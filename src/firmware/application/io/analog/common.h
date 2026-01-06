@@ -23,6 +23,12 @@ limitations under the License.
 
 namespace io::analog
 {
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_ANALOG_INPUTS>
+    {
+        public:
+        Collection() = delete;
+    };
+
     enum
     {
         GROUP_ANALOG_INPUTS,

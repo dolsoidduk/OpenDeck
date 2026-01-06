@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 
 #include "board/board.h"
 #include "common.h"

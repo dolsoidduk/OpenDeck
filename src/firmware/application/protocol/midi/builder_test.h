@@ -24,26 +24,18 @@ limitations under the License.
 
 namespace protocol::midi
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _database(_databaseAdmin)
-            , _instance(_hwaUsb, _hwaSerial, _hwaBle, _database)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
+        Builder(database::Admin& database)
             : _database(database)
             , _instance(_hwaUsb, _hwaSerial, _hwaBle, _database)
         {}
 
-        HwaUsbTest            _hwaUsb;
-        HwaSerialTest         _hwaSerial;
-        HwaBleTest            _hwaBle;
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        Database              _database;
-        Midi                  _instance;
+        HwaUsbTest    _hwaUsb;
+        HwaSerialTest _hwaSerial;
+        HwaBleTest    _hwaBle;
+        Database      _database;
+        Midi          _instance;
     };
 }    // namespace protocol::midi

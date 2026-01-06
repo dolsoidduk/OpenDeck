@@ -22,8 +22,8 @@ limitations under the License.
 #include "tests/common.h"
 #include "tests/helpers/misc.h"
 #include "tests/helpers/midi.h"
-#include "application/database/builder_test.h"
-#include "application/system/builder_hw.h"
+#include "application/database/builder.h"
+#include "application/system/builder.h"
 #include <hw_test_defines.h>
 
 #include <string>
@@ -418,8 +418,8 @@ namespace
         }
 #endif
 
-        database::BuilderTest _database;
-        test::MIDIHelper      _helper = test::MIDIHelper(true);
+        database::Builder _database;
+        test::MIDIHelper  _helper = test::MIDIHelper(true);
 #ifdef HW_TEST_FLASHING_SUPPORTED
         static bool flashed;
 #endif
@@ -821,13 +821,13 @@ TEST_F(HWTest, FwUpdate)
         ASSERT_EQ(preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::global_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::ACTIVE_PRESET));
 
         ASSERT_TRUE(_helper.databaseWriteToSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, 4, 15 + preset));
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         ASSERT_TRUE(_helper.databaseWriteToSystemViaSysEx(sys::Config::Section::encoder_t::CHANNEL, 1, 2 + preset));
 #endif
         ASSERT_TRUE(_helper.databaseWriteToSystemViaSysEx(sys::Config::Section::button_t::VALUE, 0, 90 + preset));
 
         ASSERT_EQ(15 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, 4));
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         ASSERT_EQ(2 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::encoder_t::CHANNEL, 1));
 #endif
         ASSERT_EQ(90 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::button_t::VALUE, 0));
@@ -849,7 +849,7 @@ TEST_F(HWTest, FwUpdate)
         ASSERT_EQ(preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::global_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::ACTIVE_PRESET));
 
         ASSERT_EQ(15 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, 4));
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         ASSERT_EQ(2 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::encoder_t::CHANNEL, 1));
 #endif
         ASSERT_EQ(90 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::button_t::VALUE, 0));
@@ -884,7 +884,7 @@ TEST_F(HWTest, BackupAndRestore)
 
         ASSERT_TRUE(_helper.databaseWriteToSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, ANALOG_ID, ANALOG_MIDI_ID));
 
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         const size_t ENCODER_COMPONENT = 1;
         const size_t ENCODER_MIDI_ID   = 2 + preset;
 
@@ -915,7 +915,7 @@ TEST_F(HWTest, BackupAndRestore)
         ASSERT_TRUE(_helper.databaseWriteToSystemViaSysEx(sys::Config::Section::global_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::ACTIVE_PRESET, preset));
         ASSERT_EQ(preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::global_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::ACTIVE_PRESET));
         ASSERT_EQ(4, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, 4));
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         ASSERT_EQ(1, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::encoder_t::CHANNEL, 1));
 #endif
         ASSERT_EQ(127, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::button_t::VALUE, 0));
@@ -959,7 +959,7 @@ TEST_F(HWTest, BackupAndRestore)
         ASSERT_EQ(preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::global_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::ACTIVE_PRESET));
 
         ASSERT_EQ(15 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::analog_t::MIDI_ID, 4));
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
         ASSERT_EQ(2 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::encoder_t::CHANNEL, 1));
 #endif
         ASSERT_EQ(90 + preset, _helper.databaseReadFromSystemViaSysEx(sys::Config::Section::button_t::VALUE, 0));

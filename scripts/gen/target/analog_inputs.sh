@@ -2,7 +2,10 @@
 
 if [[ "$($yaml_parser "$yaml_file" analog)" != "null" ]]
 then
-    printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_ADC)" >> "$out_cmakelists"
+    {
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_ADC)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_BUTTONS)"
+    } >> "$out_cmakelists"
 
     if [[ "$($yaml_parser "$yaml_file" analog.extReference)" == "true" ]]
     then

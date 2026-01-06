@@ -28,7 +28,6 @@ namespace io::i2c
         public:
         HwaHw() = default;
 
-#ifdef PROJECT_TARGET_SUPPORT_I2C
         bool init() override
         {
             // for i2c, consider ALREADY_INIT status a success
@@ -44,6 +43,5 @@ namespace io::i2c
         {
             return board::i2c::deviceAvailable(PROJECT_TARGET_I2C_CHANNEL_DISPLAY, address);
         }
-#endif
     };
 }    // namespace io::i2c

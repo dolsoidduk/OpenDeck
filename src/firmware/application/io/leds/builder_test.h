@@ -24,24 +24,16 @@ limitations under the License.
 
 namespace io::leds
 {
-    class BuilderTest
+    class Builder
     {
         public:
-        BuilderTest()
-            : _database(_databaseAdmin)
-            , _instance(_hwa, _database)
-        {}
-
-        // alternative database
-        BuilderTest(database::Admin& database)
+        Builder(database::Admin& database)
             : _database(database)
             , _instance(_hwa, _database)
         {}
 
-        HwaTest               _hwa;
-        database::BuilderTest _builderDatabase;
-        database::Admin&      _databaseAdmin = _builderDatabase.instance();
-        Database              _database;
-        Leds                  _instance;
+        HwaTest  _hwa;
+        Database _database;
+        Leds     _instance;
     };
 }    // namespace io::leds

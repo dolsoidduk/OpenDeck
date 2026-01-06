@@ -18,20 +18,15 @@ limitations under the License.
 
 #pragma once
 
-namespace io::analog
-{
-    class Collection : public common::BaseCollection<0>
-    {
-        public:
-        Collection() = delete;
-    };
+#include "deps.h"
 
-    class Analog : public io::Base
+namespace io::touchscreen
+{
+    class Touchscreen : public io::Base
     {
         public:
-        Analog(HWA&      hwa,
-               Filter&   filter,
-               Database& database)
+        Touchscreen(Hwa&      hwa,
+                    Database& database)
         {}
 
         bool init() override
@@ -52,4 +47,4 @@ namespace io::analog
             return 0;
         }
     };
-}    // namespace io::analog
+}    // namespace io::touchscreen

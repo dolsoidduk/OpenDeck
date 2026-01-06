@@ -21,14 +21,18 @@ limitations under the License.
 #include "analog.h"
 #include "filter_hw.h"
 #include "hwa_hw.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace io::analog
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _filter(_hwa.adcBits())
+            , _instance(_hwa, _filter, _database)
+        {}
 
         Analog& instance()
         {
@@ -37,8 +41,8 @@ namespace io::analog
 
         private:
         HwaHw    _hwa;
-        FilterHw _filter   = FilterHw(_hwa.adcBits());
-        Database _database = Database(database::BuilderHw::instance());
-        Analog   _instance = Analog(_hwa, _filter, _database);
+        Database _database;
+        FilterHw _filter;
+        Analog   _instance;
     };
 }    // namespace io::analog

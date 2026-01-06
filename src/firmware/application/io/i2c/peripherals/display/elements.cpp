@@ -16,11 +16,14 @@ limitations under the License.
 
 */
 
+#ifdef PROJECT_TARGET_SUPPORT_DISPLAY
+
 #include "display.h"
 
 #include "core/mcu.h"
 
 using namespace io::i2c::display;
+using namespace protocol;
 
 void Display::Elements::update()
 {
@@ -156,3 +159,5 @@ void Display::Elements::MIDIUpdater::updateMIDIValue(DisplayTextControl& element
         break;
     }
 }
+
+#endif

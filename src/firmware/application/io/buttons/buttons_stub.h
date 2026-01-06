@@ -18,14 +18,10 @@ limitations under the License.
 
 #pragma once
 
+#include "deps.h"
+
 namespace io::buttons
 {
-    class Collection : public common::BaseCollection<0>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Buttons : public io::Base
     {
         public:

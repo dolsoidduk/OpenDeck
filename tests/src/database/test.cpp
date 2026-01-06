@@ -19,7 +19,7 @@ limitations under the License.
 #ifndef PROJECT_TARGET_USB_OVER_SERIAL_HOST
 
 #include "tests/common.h"
-#include "application/database/builder_test.h"
+#include "application/database/builder.h"
 #include "application/io/buttons/buttons.h"
 #include "application/io/encoders/encoders.h"
 #include "application/io/analog/analog.h"
@@ -47,7 +47,7 @@ namespace
             MidiDispatcher.clear();
         }
 
-        database::BuilderTest _database;
+        database::Builder _database;
     };
 
     uint32_t _dbReadRetVal;
@@ -449,11 +449,11 @@ TEST_F(DatabaseTest, Presets)
 TEST_F(DatabaseTest, FactoryReset)
 {
     // change several values
-#ifdef BUTTONS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_BUTTONS
     ASSERT_TRUE(_database.instance().update(database::Config::Section::button_t::MIDI_ID, 0, 114));
 #endif
 
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
     ASSERT_TRUE(_database.instance().update(database::Config::Section::encoder_t::CHANNEL, 0, 11));
 #endif
 
@@ -467,11 +467,11 @@ TEST_F(DatabaseTest, FactoryReset)
     _database.instance().factoryReset();
 
     // expect default values
-#ifdef BUTTONS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_BUTTONS
     DB_READ_VERIFY(0, database::Config::Section::button_t::MIDI_ID, 0);
 #endif
 
-#ifdef ENCODERS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
     DB_READ_VERIFY(1, database::Config::Section::encoder_t::CHANNEL, 0);
 #endif
 
@@ -484,7 +484,7 @@ TEST_F(DatabaseTest, FactoryReset)
     ASSERT_FALSE(_database.instance().getPresetPreserveState());
 }
 
-#ifdef LEDS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_LEDS
 TEST_F(DatabaseTest, LEDs)
 {
     // regression test

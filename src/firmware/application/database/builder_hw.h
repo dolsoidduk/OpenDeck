@@ -24,9 +24,11 @@ limitations under the License.
 
 namespace database
 {
-    class BuilderHw
+    class Builder
     {
         public:
+        Builder() = default;
+
         // ensure only one instance on the hardware
         static Admin& instance()
         {
@@ -36,8 +38,5 @@ namespace database
 
             return admin;
         }
-
-        private:
-        BuilderHw() = default;
     };
 }    // namespace database

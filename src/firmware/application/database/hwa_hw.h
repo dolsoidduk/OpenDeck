@@ -22,6 +22,8 @@ limitations under the License.
 #include "application/messaging/messaging.h"
 #include "board/board.h"
 
+#include "core/mcu.h"
+
 namespace database
 {
     class HwaHw : public Hwa

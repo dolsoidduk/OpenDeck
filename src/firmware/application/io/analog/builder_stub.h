@@ -18,37 +18,32 @@ limitations under the License.
 
 #pragma once
 
-namespace io::leds
-{
-    class Collection : public common::BaseCollection<0>
-    {
-        public:
-        Collection() = delete;
-    };
+#include "analog_stub.h"
+#include "filter_stub.h"
+#include "hwa_stub.h"
+#include "application/database/builder.h"
 
-    class Leds : public io::Base
+namespace io::analog
+{
+    class Builder
     {
         public:
-        Leds(Hwa&      hwa,
-             Database& database)
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwa, _filter, _database)
         {}
 
-        bool init() override
+        Analog& instance()
         {
-            return false;
+            return _instance;
         }
 
-        void updateSingle(size_t index, bool forceRefresh = false) override
-        {
-        }
+        private:
+        HwaHw      _hwa;
+        FilterStub _filter;
 
-        void updateAll(bool forceRefresh = false) override
-        {
-        }
-
-        size_t maxComponentUpdateIndex() override
-        {
-            return 0;
-        }
+        public:
+        Database _database;
+        Analog   _instance;
     };
-}    // namespace io::leds
+}    // namespace io::analog

@@ -28,6 +28,7 @@ limitations under the License.
 
 using namespace io;
 using namespace sys;
+using namespace protocol;
 
 System::System(Hwa&        hwa,
                Components& components)

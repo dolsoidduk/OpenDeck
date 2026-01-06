@@ -18,7 +18,7 @@ limitations under the License.
 
 #pragma once
 
-#ifdef FW_BOOT
+#ifdef OPENDECK_FW_BOOT
 
 #define GENERATE_INDICATOR(type)
 

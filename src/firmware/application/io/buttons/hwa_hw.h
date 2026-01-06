@@ -30,7 +30,6 @@ namespace io::buttons
         public:
         HwaHw() = default;
 
-#ifdef BUTTONS_SUPPORTED
         bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states)
         {
             if (!board::io::digital_in::state(index, _dInRead))
@@ -48,7 +47,6 @@ namespace io::buttons
         {
             return board::io::digital_in::encoderFromInput(index);
         }
-#endif
 
         private:
         board::io::digital_in::Readings _dInRead;

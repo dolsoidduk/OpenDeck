@@ -20,6 +20,8 @@ limitations under the License.
 
 #include "nextion.h"
 
+#include "application/io/touchscreen/touchscreen.h"
+
 #include "core/mcu.h"
 
 #include <stdarg.h>

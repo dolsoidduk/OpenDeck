@@ -2,7 +2,10 @@
 
 if [[ "$($yaml_parser "$yaml_file" leds.external)" != "null" ]]
 then
-    printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_DIGITAL_OUTPUTS)" >> "$out_cmakelists"
+    {
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_DIGITAL_OUTPUTS)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_LEDS)"
+    } >> "$out_cmakelists"
 
     digital_out_type=$($yaml_parser "$yaml_file" leds.external.type)
 

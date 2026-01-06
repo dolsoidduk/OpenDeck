@@ -20,21 +20,21 @@ limitations under the License.
 
 #include "system.h"
 #include "hwa_hw.h"
-#include "application/io/analog/builder_hw.h"
-#include "application/io/buttons/builder_hw.h"
-#include "application/io/encoders/builder_hw.h"
-#include "application/io/touchscreen/builder_hw.h"
-#include "application/io/i2c/builder_hw.h"
-#include "application/io/leds/builder_hw.h"
-#include "application/database/builder_hw.h"
-#include "application/protocol/midi/builder_hw.h"
+#include "application/database/builder.h"
+#include "application/protocol/midi/builder.h"
+#include "application/io/analog/builder.h"
+#include "application/io/buttons/builder.h"
+#include "application/io/encoders/builder.h"
+#include "application/io/touchscreen/builder.h"
+#include "application/io/i2c/builder.h"
+#include "application/io/leds/builder.h"
 
 namespace sys
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder() = default;
 
         System& instance()
         {
@@ -72,16 +72,17 @@ namespace sys
             }
 
             private:
-            io::analog::BuilderHw                                                          _builderAnalog;
-            io::encoders::BuilderHw                                                        _builderEncoders;
-            io::leds::BuilderHw                                                            _builderLeds;
-            io::buttons::BuilderHw                                                         _builderButtons;
-            io::touchscreen::BuilderHw                                                     _builderTouchscreen;
-            io::i2c::BuilderHw                                                             _builderI2c;
-            protocol::midi::BuilderHw                                                      _builderMidi;
-            std::array<io::Base*, static_cast<size_t>(io::ioComponent_t::AMOUNT)>          _io       = {};
-            std::array<protocol::Base*, static_cast<size_t>(protocol::protocol_t::AMOUNT)> _protocol = {};
-            database::Admin&                                                               _database = database::BuilderHw::instance();
+            database::Builder                                                              _builderDatabase;
+            database::Admin&                                                               _database           = _builderDatabase.instance();
+            io::analog::Builder                                                            _builderAnalog      = io::analog::Builder(_database);
+            io::encoders::Builder                                                          _builderEncoders    = io::encoders::Builder(_database);
+            io::leds::Builder                                                              _builderLeds        = io::leds::Builder(_database);
+            io::buttons::Builder                                                           _builderButtons     = io::buttons::Builder(_database);
+            io::touchscreen::Builder                                                       _builderTouchscreen = io::touchscreen::Builder(_database);
+            io::i2c::Builder                                                               _builderI2c         = io::i2c::Builder(_database);
+            protocol::midi::Builder                                                        _builderMidi        = protocol::midi::Builder(_database);
+            std::array<io::Base*, static_cast<size_t>(io::ioComponent_t::AMOUNT)>          _io                 = {};
+            std::array<protocol::Base*, static_cast<size_t>(protocol::protocol_t::AMOUNT)> _protocol           = {};
         };
 
         HwaHw        _hwa;

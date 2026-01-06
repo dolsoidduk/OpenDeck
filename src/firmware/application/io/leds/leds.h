@@ -27,20 +27,8 @@ limitations under the License.
 
 #include <optional>
 
-using namespace protocol;
-
-#if defined(PROJECT_TARGET_SUPPORT_DIGITAL_OUTPUTS) || defined(PROJECT_TARGET_SUPPORT_TOUCHSCREEN)
-#define LEDS_SUPPORTED
-
 namespace io::leds
 {
-    class Collection : public common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_OUTPUTS,
-                                                     PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Leds : public io::Base
     {
         public:
@@ -88,18 +76,18 @@ namespace io::leds
             0,
         };
 
-        static constexpr midi::messageType_t CONTROL_TYPE_TO_MIDI_MESSAGE[static_cast<uint8_t>(controlType_t::AMOUNT)] = {
-            midi::messageType_t::NOTE_ON,           // MIDI_IN_NOTE_SINGLE_VAL,
-            midi::messageType_t::NOTE_ON,           // LOCAL_NOTE_SINGLE_VAL,
-            midi::messageType_t::CONTROL_CHANGE,    // MIDI_IN_CC_SINGLE_VAL,
-            midi::messageType_t::CONTROL_CHANGE,    // LOCAL_CC_SINGLE_VAL,
-            midi::messageType_t::PROGRAM_CHANGE,    // PC_SINGLE_VAL,
-            midi::messageType_t::PROGRAM_CHANGE,    // PRESET,
-            midi::messageType_t::NOTE_ON,           // MIDI_IN_NOTE_MULTI_VAL,
-            midi::messageType_t::NOTE_ON,           // LOCAL_NOTE_MULTI_VAL,
-            midi::messageType_t::CONTROL_CHANGE,    // MIDI_IN_CC_MULTI_VAL,
-            midi::messageType_t::CONTROL_CHANGE,    // LOCAL_CC_MULTI_VAL,
-            midi::messageType_t::INVALID,           // STATIC
+        static constexpr protocol::midi::messageType_t CONTROL_TYPE_TO_MIDI_MESSAGE[static_cast<uint8_t>(controlType_t::AMOUNT)] = {
+            protocol::midi::messageType_t::NOTE_ON,           // MIDI_IN_NOTE_SINGLE_VAL,
+            protocol::midi::messageType_t::NOTE_ON,           // LOCAL_NOTE_SINGLE_VAL,
+            protocol::midi::messageType_t::CONTROL_CHANGE,    // MIDI_IN_CC_SINGLE_VAL,
+            protocol::midi::messageType_t::CONTROL_CHANGE,    // LOCAL_CC_SINGLE_VAL,
+            protocol::midi::messageType_t::PROGRAM_CHANGE,    // PC_SINGLE_VAL,
+            protocol::midi::messageType_t::PROGRAM_CHANGE,    // PRESET,
+            protocol::midi::messageType_t::NOTE_ON,           // MIDI_IN_NOTE_MULTI_VAL,
+            protocol::midi::messageType_t::NOTE_ON,           // LOCAL_NOTE_MULTI_VAL,
+            protocol::midi::messageType_t::CONTROL_CHANGE,    // MIDI_IN_CC_MULTI_VAL,
+            protocol::midi::messageType_t::CONTROL_CHANGE,    // LOCAL_CC_MULTI_VAL,
+            protocol::midi::messageType_t::INVALID,           // STATIC
         };
 
         Hwa&      _hwa;
@@ -142,14 +130,10 @@ namespace io::leds
         blinkSpeed_t           valueToBlinkSpeed(uint8_t value);
         brightness_t           valueToBrightness(uint8_t value);
         void                   startUpAnimation();
-        bool                   isControlTypeMatched(midi::messageType_t midiMessage, controlType_t controlType);
+        bool                   isControlTypeMatched(protocol::midi::messageType_t midiMessage, controlType_t controlType);
         void                   midiToState(const messaging::Event& event, messaging::eventType_t source);
         void                   setState(size_t index, brightness_t brightness);
         std::optional<uint8_t> sysConfigGet(sys::Config::Section::leds_t section, size_t index, uint16_t& value);
         std::optional<uint8_t> sysConfigSet(sys::Config::Section::leds_t section, size_t index, uint16_t value);
     };
 }    // namespace io::leds
-
-#else
-#include "stub.h"
-#endif

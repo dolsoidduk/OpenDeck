@@ -32,15 +32,8 @@ namespace io::analog
         public:
         virtual ~Hwa() = default;
 
-        virtual bool value(size_t index, uint16_t& value)
-        {
-            return false;
-        }
-
-        virtual uint8_t adcBits()
-        {
-            return 10;
-        }
+        virtual bool    value(size_t index, uint16_t& value) = 0;
+        virtual uint8_t adcBits()                            = 0;
     };
 
     class Filter

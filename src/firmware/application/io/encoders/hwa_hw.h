@@ -30,7 +30,6 @@ namespace io::encoders
         public:
         HwaHw() = default;
 
-#ifdef ENCODERS_SUPPORTED
         bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states) override
         {
             if (!board::io::digital_in::state(board::io::digital_in::encoderComponentFromEncoder(index,
@@ -68,6 +67,5 @@ namespace io::encoders
         private:
         board::io::digital_in::Readings _dInReadA;
         board::io::digital_in::Readings _dInReadB;
-#endif
     };
 }    // namespace io::encoders

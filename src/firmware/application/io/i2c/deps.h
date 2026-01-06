@@ -28,20 +28,9 @@ namespace io::i2c
         public:
         virtual ~Hwa() = default;
 
-        virtual bool init()
-        {
-            return false;
-        }
-
-        virtual bool write(uint8_t address, uint8_t* buffer, size_t size)
-        {
-            return false;
-        }
-
-        virtual bool deviceAvailable(uint8_t address)
-        {
-            return false;
-        }
+        virtual bool init()                                               = 0;
+        virtual bool write(uint8_t address, uint8_t* buffer, size_t size) = 0;
+        virtual bool deviceAvailable(uint8_t address)                     = 0;
     };
 
     class Peripheral

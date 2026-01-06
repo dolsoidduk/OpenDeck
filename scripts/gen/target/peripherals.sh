@@ -141,7 +141,11 @@ then
 
     if [[ "$($yaml_parser "$yaml_file" uart.touchscreen)" != "null" ]]
     then
-        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_TOUCHSCREEN)" >> "$out_cmakelists"
+        {
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_TOUCHSCREEN)"
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_BUTTONS)"
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_LEDS)"
+        } >> "$out_cmakelists"
 
         uart_channel_touchscreen=$($yaml_parser "$yaml_file" uart.touchscreen.channel)
         uart_touchscreen_pins=$($yaml_parser "$yaml_file" uart.touchscreen.pins)

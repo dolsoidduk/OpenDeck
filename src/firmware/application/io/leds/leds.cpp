@@ -16,18 +16,19 @@ limitations under the License.
 
 */
 
+#ifdef PROJECT_TARGET_SUPPORT_LEDS
+
 #include "leds.h"
 #include "application/messaging/messaging.h"
 #include "application/global/midi_program.h"
 #include "application/util/conversion/conversion.h"
 #include "application/util/configurable/configurable.h"
 
-#ifdef LEDS_SUPPORTED
-
 #include "core/mcu.h"
 #include "core/util/util.h"
 
 using namespace io::leds;
+using namespace protocol;
 
 Leds::Leds(Hwa&      hwa,
            Database& database)

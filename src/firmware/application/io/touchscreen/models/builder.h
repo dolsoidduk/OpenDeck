@@ -18,29 +18,4 @@ limitations under the License.
 
 #pragma once
 
-#include "application/io/touchscreen/touchscreen.h"
-
-#ifdef PROJECT_TARGET_SUPPORT_TOUCHSCREEN
-
-#include "nextion/nextion.h"
-#include "viewtech/viewtech.h"
-
-namespace io::touchscreen
-{
-    class ModelsBuilder
-    {
-        public:
-        ModelsBuilder(Hwa& hwa)
-            : _nextion(hwa)
-            , _viewtech(hwa)
-        {}
-
-        private:
-        Nextion  _nextion;
-        Viewtech _viewtech;
-    };
-}    // namespace io::touchscreen
-
-#else
-#include "stub.h"
-#endif
+#include "application/io/touchscreen/models/builder_hw.h"

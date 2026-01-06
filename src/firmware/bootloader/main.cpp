@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 #include "board/board.h"
-#include "bootloader/updater/builder_hw.h"
+#include "bootloader/updater/builder.h"
 #include "sysex_parser/sysex_parser.h"
-#include "fw_selector/builder_hw.h"
+#include "fw_selector/builder.h"
 
 #include "core/mcu.h"
 
@@ -53,15 +53,15 @@ class Reader
     }
 
     private:
-    updater::BuilderHw        _builderUpdater;
+    updater::Builder          _builderUpdater;
     protocol::midi::UsbPacket _usbMIDIpacket;
     sysex_parser::SysExParser _sysExParser;
 };
 
 namespace
 {
-    fw_selector::BuilderHw builderFwSelector;
-    Reader                 reader;
+    fw_selector::Builder builderFwSelector;
+    Reader               reader;
 }    // namespace
 
 int main()

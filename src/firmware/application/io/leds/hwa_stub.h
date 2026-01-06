@@ -18,37 +18,27 @@ limitations under the License.
 
 #pragma once
 
-namespace io::touchscreen
+#include "deps.h"
+
+namespace io::leds
 {
-    class Collection : public common::BaseCollection<0>
+    class HwaStub : public Hwa
     {
         public:
-        Collection() = delete;
-    };
+        HwaStub() = default;
 
-    class Touchscreen : public io::Base
-    {
-        public:
-        Touchscreen(Hwa&      hwa,
-                    Database& database)
-        {}
-
-        bool init() override
-        {
-            return false;
-        }
-
-        void updateSingle(size_t index, bool forceRefresh = false) override
+        void setState(size_t index, brightness_t brightness) override
         {
         }
 
-        void updateAll(bool forceRefresh = false) override
+        size_t rgbFromOutput(size_t index) override
         {
+            return 0;
         }
 
-        size_t maxComponentUpdateIndex() override
+        size_t rgbComponentFromRgb(size_t index, rgbComponent_t component) override
         {
             return 0;
         }
     };
-}    // namespace io::touchscreen
+}    // namespace io::leds

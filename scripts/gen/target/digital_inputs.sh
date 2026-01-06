@@ -2,7 +2,11 @@
 
 if [[ "$($yaml_parser "$yaml_file" buttons)" != "null" ]]
 then
-    printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_DIGITAL_INPUTS)" >> "$out_cmakelists"
+    {
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_DIGITAL_INPUTS)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_BUTTONS)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_ENCODERS)"
+    } >> "$out_cmakelists"
 
     digital_in_type=$($yaml_parser "$yaml_file" buttons.type)
 

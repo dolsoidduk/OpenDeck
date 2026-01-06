@@ -26,18 +26,8 @@ limitations under the License.
 
 #include <optional>
 
-#ifdef PROJECT_TARGET_SUPPORT_ADC
-
-using namespace protocol;
-
 namespace io::analog
 {
-    class Collection : public common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_ANALOG_INPUTS>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Analog : public io::Base
     {
         public:
@@ -66,16 +56,16 @@ namespace io::analog
             messaging::Event event       = {};
         };
 
-        static constexpr midi::messageType_t INTERNAL_MSG_TO_MIDI_TYPE[static_cast<uint8_t>(type_t::AMOUNT)] = {
-            midi::messageType_t::CONTROL_CHANGE,          // POTENTIOMETER_CONTROL_CHANGE
-            midi::messageType_t::NOTE_ON,                 // POTENTIOMETER_NOTE
-            midi::messageType_t::NOTE_ON,                 // FSR (set to note off when appropriate)
-            midi::messageType_t::INVALID,                 // BUTTON (let other listeners handle this)
-            midi::messageType_t::NRPN_7BIT,               // NRPN_7BIT
-            midi::messageType_t::NRPN_14BIT,              // NRPN_14BIT
-            midi::messageType_t::PITCH_BEND,              // PITCH_BEND
-            midi::messageType_t::CONTROL_CHANGE_14BIT,    // CONTROL_CHANGE_14BIT
-            midi::messageType_t::INVALID,                 // RESERVED
+        static constexpr protocol::midi::messageType_t INTERNAL_MSG_TO_MIDI_TYPE[static_cast<uint8_t>(type_t::AMOUNT)] = {
+            protocol::midi::messageType_t::CONTROL_CHANGE,          // POTENTIOMETER_CONTROL_CHANGE
+            protocol::midi::messageType_t::NOTE_ON,                 // POTENTIOMETER_NOTE
+            protocol::midi::messageType_t::NOTE_ON,                 // FSR (set to note off when appropriate)
+            protocol::midi::messageType_t::INVALID,                 // BUTTON (let other listeners handle this)
+            protocol::midi::messageType_t::NRPN_7BIT,               // NRPN_7BIT
+            protocol::midi::messageType_t::NRPN_14BIT,              // NRPN_14BIT
+            protocol::midi::messageType_t::PITCH_BEND,              // PITCH_BEND
+            protocol::midi::messageType_t::CONTROL_CHANGE_14BIT,    // CONTROL_CHANGE_14BIT
+            protocol::midi::messageType_t::INVALID,                 // RESERVED
         };
 
         Hwa&      _hwa;
@@ -95,7 +85,3 @@ namespace io::analog
         std::optional<uint8_t> sysConfigSet(sys::Config::Section::analog_t section, size_t index, uint16_t value);
     };
 }    // namespace io::analog
-
-#else
-#include "stub.h"
-#endif

@@ -24,10 +24,12 @@ limitations under the License.
 
 namespace io::i2c
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _peripherals(_hwa, database)
+        {}
 
         I2c& instance()
         {
@@ -36,8 +38,7 @@ namespace io::i2c
 
         private:
         HwaHw              _hwa;
-        database::Admin&   _database    = database::BuilderHw::instance();
-        PeripheralsBuilder _peripherals = PeripheralsBuilder(_hwa, _database);
+        BuilderPeripherals _peripherals;
         I2c                _instance;
     };
 }    // namespace io::i2c

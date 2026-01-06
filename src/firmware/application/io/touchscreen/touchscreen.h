@@ -25,16 +25,8 @@ limitations under the License.
 
 #include <optional>
 
-#ifdef PROJECT_TARGET_SUPPORT_TOUCHSCREEN
-
 namespace io::touchscreen
 {
-    class Collection : public common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Touchscreen : public io::Base
     {
         public:
@@ -71,7 +63,3 @@ namespace io::touchscreen
         std::optional<uint8_t> sysConfigSet(sys::Config::Section::touchscreen_t section, size_t index, uint16_t value);
     };
 }    // namespace io::touchscreen
-
-#else
-#include "stub.h"
-#endif

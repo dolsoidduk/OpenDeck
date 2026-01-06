@@ -18,11 +18,16 @@ limitations under the License.
 
 #pragma once
 
-#include <inttypes.h>
-#include <stddef.h>
+#include "application/io/common/common.h"
 
 namespace io::touchscreen
 {
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
+    {
+        public:
+        Collection() = delete;
+    };
+
     enum class setting_t : uint8_t
     {
         ENABLE,

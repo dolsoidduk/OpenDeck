@@ -20,6 +20,8 @@ limitations under the License.
 
 #include "viewtech.h"
 
+#include "application/io/touchscreen/touchscreen.h"
+
 #include "core/mcu.h"
 #include "core/util/util.h"
 

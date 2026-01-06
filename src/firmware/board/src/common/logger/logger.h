@@ -23,7 +23,7 @@ limitations under the License.
 #include "core/util/logger.h"
 
 #ifdef BOARD_USE_LOGGER
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 constexpr inline size_t BOARD_LOGGER_SIZE = 128;
 CORE_LOGGER_DECLARE(BOARD_LOGGER, BOARD_LOGGER_SIZE);
 

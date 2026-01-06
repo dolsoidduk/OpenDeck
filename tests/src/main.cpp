@@ -21,7 +21,7 @@ limitations under the License.
 
 #include "core/mcu.h"
 
-#ifdef APP_USE_LOGGER
+#ifdef OPENDECK_USE_LOGGER
 CORE_LOGGER_CREATE(APP_LOGGER, [](const char* message)
                    {
                        std::cout << message;

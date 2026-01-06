@@ -21,14 +21,17 @@ limitations under the License.
 #include "buttons.h"
 #include "filter_hw.h"
 #include "hwa_hw.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace io::buttons
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwa, _filter, _database)
+        {}
 
         Buttons& instance()
         {
@@ -36,9 +39,9 @@ namespace io::buttons
         }
 
         private:
+        Database _database;
         HwaHw    _hwa;
         FilterHw _filter;
-        Database _database = Database(database::BuilderHw::instance());
-        Buttons  _instance = Buttons(_hwa, _filter, _database);
+        Buttons  _instance;
     };
 }    // namespace io::buttons

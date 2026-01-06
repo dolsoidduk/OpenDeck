@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 #ifdef BOARD_USE_LOGGER
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 
 #include "logger.h"
 

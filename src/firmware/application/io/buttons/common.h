@@ -18,11 +18,19 @@ limitations under the License.
 
 #pragma once
 
-#include <inttypes.h>
+#include "application/io/common/common.h"
 
 namespace io::buttons
 {
     constexpr inline uint32_t DEBOUNCE_TIME_MS = 8;
+
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS,
+                                                         PROJECT_TARGET_SUPPORTED_NR_OF_ANALOG_INPUTS,
+                                                         PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
+    {
+        public:
+        Collection() = delete;
+    };
 
     enum
     {

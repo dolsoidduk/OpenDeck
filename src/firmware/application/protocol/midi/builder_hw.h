@@ -20,14 +20,17 @@ limitations under the License.
 
 #include "midi.h"
 #include "hwa_hw.h"
-#include "application/database/builder_hw.h"
+#include "application/database/builder.h"
 
 namespace protocol::midi
 {
-    class BuilderHw
+    class Builder
     {
         public:
-        BuilderHw() = default;
+        Builder(database::Admin& database)
+            : _database(database)
+            , _instance(_hwaUsb, _hwaSerial, _hwaBle, _database)
+        {}
 
         Midi& instance()
         {
@@ -38,7 +41,7 @@ namespace protocol::midi
         HwaUsbHw    _hwaUsb;
         HwaSerialHw _hwaSerial;
         HwaBleHw    _hwaBle;
-        Database    _database = Database(database::BuilderHw::instance());
-        Midi        _instance = Midi(_hwaUsb, _hwaSerial, _hwaBle, _database);
+        Database    _database;
+        Midi        _instance;
     };
 }    // namespace protocol::midi

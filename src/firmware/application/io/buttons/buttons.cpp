@@ -16,6 +16,8 @@ limitations under the License.
 
 */
 
+#ifdef PROJECT_TARGET_SUPPORT_BUTTONS
+
 #include "buttons.h"
 #include "application/system/config.h"
 #include "application/global/midi_program.h"
@@ -23,12 +25,11 @@ limitations under the License.
 #include "application/util/conversion/conversion.h"
 #include "application/util/configurable/configurable.h"
 
-#ifdef BUTTONS_SUPPORTED
-
 #include "core/mcu.h"
 #include "core/util/util.h"
 
 using namespace io::buttons;
+using namespace protocol;
 
 Buttons::Buttons(Hwa&      hwa,
                  Filter&   filter,

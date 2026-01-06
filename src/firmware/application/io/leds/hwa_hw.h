@@ -28,7 +28,6 @@ namespace io::leds
         public:
         HwaHw() = default;
 
-#ifdef PROJECT_TARGET_SUPPORT_ADC
         void setState(size_t index, brightness_t brightness) override
         {
             board::io::digital_out::writeLedState(index, static_cast<board::io::digital_out::ledBrightness_t>(brightness));
@@ -44,6 +43,5 @@ namespace io::leds
             return board::io::digital_out::rgbComponentFromRgb(index,
                                                                static_cast<board::io::digital_out::rgbComponent_t>(component));
         }
-#endif
     };
 }    // namespace io::leds

@@ -18,28 +18,4 @@ limitations under the License.
 
 #pragma once
 
-#include "display/display.h"
-#include "application/io/i2c/i2c.h"
-#include "application/database/database.h"
-
-#ifdef PROJECT_TARGET_SUPPORT_I2C
-
-namespace io::i2c
-{
-    class PeripheralsBuilder
-    {
-        public:
-        PeripheralsBuilder(Hwa& hwa, database::Admin& database)
-            : _displayDatabase(database)
-            , _display(hwa, _displayDatabase)
-        {}
-
-        private:
-        display::Database _displayDatabase;
-        display::Display  _display;
-    };
-}    // namespace io::i2c
-
-#else
-#include "stub.h"
-#endif
+#include "application/io/i2c/peripherals/builder_hw.h"

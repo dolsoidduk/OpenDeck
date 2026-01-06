@@ -17,12 +17,14 @@ limitations under the License.
 */
 
 #include "application/database/database.h"
-#include "application/io/buttons/buttons.h"
-#include "application/io/analog/analog.h"
-#include "application/io/leds/leds.h"
+#include "application/io/buttons/common.h"
+#include "application/io/analog/common.h"
+#include "application/io/leds/common.h"
+#include "application/protocol/midi/common.h"
 
 using namespace database;
 using namespace io;
+using namespace protocol;
 
 // each new group of components should have their IDs start from 0
 

@@ -16,11 +16,9 @@ limitations under the License.
 
 */
 
-#include "application/system/builder_hw.h"
+#include "application/system/builder.h"
 
-#include "core/mcu.h"
-
-sys::BuilderHw builderSystem;
+sys::Builder builderSystem;
 
 int main()
 {

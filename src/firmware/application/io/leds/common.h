@@ -18,10 +18,17 @@ limitations under the License.
 
 #pragma once
 
-#include <inttypes.h>
+#include "application/io/common/common.h"
 
 namespace io::leds
 {
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_OUTPUTS,
+                                                         PROJECT_TARGET_SUPPORTED_NR_OF_TOUCHSCREEN_COMPONENTS>
+    {
+        public:
+        Collection() = delete;
+    };
+
     enum
     {
         GROUP_DIGITAL_OUTPUTS,

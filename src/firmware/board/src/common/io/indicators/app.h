@@ -20,7 +20,7 @@ limitations under the License.
 
 #include <inttypes.h>
 
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 
 #define GENERATE_INDICATOR(type)             \
     namespace                                \
@@ -53,16 +53,15 @@ limitations under the License.
 #define INDICATE_TRAFFIC_TYPE(type, direction)                           \
     do                                                                   \
     {                                                                    \
-        using namespace board::io::indicators;                           \
         switch (direction)                                               \
         {                                                                \
-        case direction_t::INCOMING:                                      \
+        case board::io::indicators::direction_t::INCOMING:               \
         {                                                                \
             _inTimeout##type = LED_TRAFFIC_INDICATOR_TIMEOUT;            \
             LED_ON(INDICATOR_PORT_IN(type), INDICATOR_INDEX_IN(type));   \
         }                                                                \
         break;                                                           \
-        case direction_t::OUTGOING:                                      \
+        case board::io::indicators::direction_t::OUTGOING:               \
         {                                                                \
             _outTimeout##type = LED_TRAFFIC_INDICATOR_TIMEOUT;           \
             LED_ON(INDICATOR_PORT_OUT(type), INDICATOR_INDEX_OUT(type)); \

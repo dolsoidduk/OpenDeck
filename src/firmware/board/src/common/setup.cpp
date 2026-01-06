@@ -24,7 +24,7 @@ limitations under the License.
 namespace
 {
     constexpr uint32_t MAIN_TIMER_TIMEOUT_US = 1000;
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 #if defined(BOARD_USE_FAST_SOFT_PWM_TIMER) && defined(PROJECT_TARGET_SUPPORT_SOFT_PWM)
     constexpr uint32_t SOFT_PWM_TIMER_TIMEOUT_US = 200;
 #endif
@@ -37,7 +37,7 @@ namespace board
 {
     void init()
     {
-#if defined(FW_APP)
+#if defined(OPENDECK_FW_APP)
         detail::setup::application();
 
         size_t mainTimerIndex = 0;
@@ -63,7 +63,7 @@ namespace board
 
         core::mcu::timers::allocate(pwmTimerIndex, []()
                                     {
-#ifdef FW_APP
+#ifdef OPENDECK_FW_APP
 #ifndef PROJECT_TARGET_USB_OVER_SERIAL_HOST
 #if PROJECT_TARGET_MAX_NR_OF_DIGITAL_OUTPUTS > 0
                                         detail::io::digital_out::update();
@@ -75,7 +75,7 @@ namespace board
         core::mcu::timers::setPeriod(pwmTimerIndex, SOFT_PWM_TIMER_TIMEOUT_US);
         core::mcu::timers::start(pwmTimerIndex);
 #endif
-#elif defined(FW_BOOT)
+#elif defined(OPENDECK_FW_BOOT)
         detail::setup::bootloader();
 
         size_t mainTimerIndex = 0;

@@ -28,19 +28,8 @@ limitations under the License.
 
 #include <optional>
 
-using namespace protocol;
-
-#if defined(PROJECT_TARGET_SUPPORT_DIGITAL_INPUTS) && (PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS > 1)
-#define ENCODERS_SUPPORTED
-
 namespace io::encoders
 {
-    class Collection : public common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS / 2>
-    {
-        public:
-        Collection() = delete;
-    };
-
     class Encoders : public io::Base
     {
         public:
@@ -62,8 +51,8 @@ namespace io::encoders
             messaging::Event event = {};
         };
 
-        using ValueIncDecMIDI7Bit  = util::IncDec<uint8_t, 0, midi::MAX_VALUE_7BIT>;
-        using ValueIncDecMIDI14Bit = util::IncDec<uint16_t, 0, midi::MAX_VALUE_14BIT>;
+        using ValueIncDecMIDI7Bit  = util::IncDec<uint8_t, 0, protocol::midi::MAX_VALUE_7BIT>;
+        using ValueIncDecMIDI14Bit = util::IncDec<uint16_t, 0, protocol::midi::MAX_VALUE_14BIT>;
 
         /// Time threshold in milliseconds between two encoder steps used to detect fast movement.
         static constexpr uint32_t ENCODERS_SPEED_TIMEOUT = 140;
@@ -125,22 +114,22 @@ namespace io::encoders
             1      // CW
         };
 
-        static constexpr std::array<midi::messageType_t, static_cast<uint8_t>(type_t::AMOUNT)> INTERNAL_MSG_TO_MIDI_TYPE = {
-            midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE_7FH01H
-            midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE_3FH41H
-            midi::messageType_t::PROGRAM_CHANGE,          // PROGRAM_CHANGE
-            midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE
-            midi::messageType_t::INVALID,                 // PRESET_CHANGE
-            midi::messageType_t::PITCH_BEND,              // PITCH_BEND
-            midi::messageType_t::NRPN_7BIT,               // NRPN_7BIT
-            midi::messageType_t::NRPN_14BIT,              // NRPN_14BIT
-            midi::messageType_t::CONTROL_CHANGE_14BIT,    // CONTROL_CHANGE_14BIT
-            midi::messageType_t::CONTROL_CHANGE,          // RESERVED
-            midi::messageType_t::INVALID,                 // BPM_CHANGE
-            midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_VARIABLE_VAL
-            midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_FIXED_VAL_BOTH_DIR
-            midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_FIXED_VAL_ONE_DIR_0_OTHER_DIR
-            midi::messageType_t::NOTE_ON,                 // TWO_NOTE_FIXED_VAL_BOTH_DIR
+        static constexpr std::array<protocol::midi::messageType_t, static_cast<uint8_t>(type_t::AMOUNT)> INTERNAL_MSG_TO_MIDI_TYPE = {
+            protocol::midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE_7FH01H
+            protocol::midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE_3FH41H
+            protocol::midi::messageType_t::PROGRAM_CHANGE,          // PROGRAM_CHANGE
+            protocol::midi::messageType_t::CONTROL_CHANGE,          // CONTROL_CHANGE
+            protocol::midi::messageType_t::INVALID,                 // PRESET_CHANGE
+            protocol::midi::messageType_t::PITCH_BEND,              // PITCH_BEND
+            protocol::midi::messageType_t::NRPN_7BIT,               // NRPN_7BIT
+            protocol::midi::messageType_t::NRPN_14BIT,              // NRPN_14BIT
+            protocol::midi::messageType_t::CONTROL_CHANGE_14BIT,    // CONTROL_CHANGE_14BIT
+            protocol::midi::messageType_t::CONTROL_CHANGE,          // RESERVED
+            protocol::midi::messageType_t::INVALID,                 // BPM_CHANGE
+            protocol::midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_VARIABLE_VAL
+            protocol::midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_FIXED_VAL_BOTH_DIR
+            protocol::midi::messageType_t::NOTE_ON,                 // SINGLE_NOTE_FIXED_VAL_ONE_DIR_0_OTHER_DIR
+            protocol::midi::messageType_t::NOTE_ON,                 // TWO_NOTE_FIXED_VAL_BOTH_DIR
         };
 
         Hwa&      _hwa;
@@ -171,7 +160,3 @@ namespace io::encoders
         std::optional<uint8_t> sysConfigSet(sys::Config::Section::encoder_t section, size_t index, uint16_t value);
     };
 }    // namespace io::encoders
-
-#else
-#include "stub.h"
-#endif

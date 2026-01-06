@@ -18,12 +18,14 @@ limitations under the License.
 
 #include "tests/common.h"
 #include "tests/helpers/listener.h"
-#include "application/io/leds/builder_test.h"
+#include "application/io/leds/builder.h"
 #include "application/util/configurable/configurable.h"
+#include "application/global/midi_program.h"
 
-#ifdef LEDS_SUPPORTED
+#ifdef PROJECT_TARGET_SUPPORT_LEDS
 
 using namespace io;
+using namespace protocol;
 
 namespace
 {
@@ -32,9 +34,9 @@ namespace
         protected:
         void SetUp() override
         {
-            ASSERT_TRUE(_leds._databaseAdmin.init());
-            ASSERT_TRUE(_leds._databaseAdmin.factoryReset());
-            ASSERT_EQ(0, _leds._databaseAdmin.getPreset());
+            ASSERT_TRUE(_databaseAdmin.init());
+            ASSERT_TRUE(_databaseAdmin.factoryReset());
+            ASSERT_EQ(0, _databaseAdmin.getPreset());
 
             // LEDs calls HWA only for digital out group - for the other groups controls is done via dispatcher.
             // Once init() is called, all LEDs should be turned off
@@ -315,7 +317,9 @@ namespace
             leds::blinkSpeed_t::NO_BLINK,
         };
 
-        leds::BuilderTest _leds;
+        database::Builder _builderDatabase;
+        database::Admin&  _databaseAdmin = _builderDatabase.instance();
+        leds::Builder     _leds          = leds::Builder(_databaseAdmin);
     };
 }    // namespace
 

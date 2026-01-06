@@ -533,7 +533,7 @@ namespace board
         void     erasePage(size_t index);
         void     fillPage(size_t index, uint32_t address, uint32_t value);
         void     commitPage(size_t index);
-#ifdef FW_BOOT
+#ifdef OPENDECK_FW_BOOT
         // don't allow this API from application
         uint8_t readFlash(uint32_t address);
 #endif

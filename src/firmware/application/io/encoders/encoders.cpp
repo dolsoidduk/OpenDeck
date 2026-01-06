@@ -16,17 +16,18 @@ limitations under the License.
 
 */
 
+#ifdef PROJECT_TARGET_SUPPORT_ENCODERS
+
 #include "encoders.h"
 #include "application/util/conversion/conversion.h"
 #include "application/util/configurable/configurable.h"
 #include "application/global/bpm.h"
 
-#ifdef ENCODERS_SUPPORTED
-
 #include "core/mcu.h"
 #include "core/util/util.h"
 
 using namespace io::encoders;
+using namespace protocol;
 
 Encoders::Encoders(Hwa&      hwa,
                    Filter&   filter,
