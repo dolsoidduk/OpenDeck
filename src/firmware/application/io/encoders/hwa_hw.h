@@ -31,7 +31,7 @@ namespace io::encoders
         HwaHw() = default;
 
 #ifdef ENCODERS_SUPPORTED
-        bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states)
+        bool state(size_t index, uint8_t& numberOfReadings, uint16_t& states) override
         {
             if (!board::io::digital_in::state(board::io::digital_in::encoderComponentFromEncoder(index,
                                                                                                  board::io::digital_in::encoderComponent_t::A),
