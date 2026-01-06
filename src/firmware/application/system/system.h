@@ -91,7 +91,7 @@ namespace sys
 
         Hwa&                      _hwa;
         Components&               _components;
-        DatabaseHandlers          _DatabaseHandlers;
+        DatabaseHandlers          _databaseHandlers;
         SysExDataHandler          _sysExDataHandler;
         lib::sysexconf::SysExConf _sysExConf;
         util::Scheduler           _scheduler;

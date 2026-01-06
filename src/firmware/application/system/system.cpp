@@ -34,7 +34,7 @@ System::System(Hwa&        hwa,
                Components& components)
     : _hwa(hwa)
     , _components(components)
-    , _DatabaseHandlers(*this)
+    , _databaseHandlers(*this)
     , _sysExDataHandler(*this)
     , _sysExConf(
           _sysExDataHandler,
@@ -153,7 +153,7 @@ bool System::init()
         return false;
     }
 
-    if (!_components.database().init(_DatabaseHandlers))
+    if (!_components.database().init(_databaseHandlers))
     {
         return false;
     }
