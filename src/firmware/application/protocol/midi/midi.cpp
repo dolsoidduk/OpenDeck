@@ -851,7 +851,8 @@ std::optional<uint8_t> Midi::sysConfigSet(sys::Config::Section::global_t section
                     dinMIDIinitAction = io::common::initAction_t::DE_INIT;
                 }
 
-                result = sys::Config::Status::ACK;
+                checkDINLoopback = true;
+                result           = sys::Config::Status::ACK;
             }
         }
         else
