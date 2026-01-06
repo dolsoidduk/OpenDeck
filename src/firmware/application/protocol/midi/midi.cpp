@@ -243,11 +243,11 @@ bool Midi::setupThru()
 
     if (isSettingEnabled(setting_t::DIN_THRU_BLE))
     {
-        _serial.registerThruInterface(_serial.transport());
+        _serial.registerThruInterface(_ble.transport());
     }
     else
     {
-        _serial.unregisterThruInterface(_serial.transport());
+        _serial.unregisterThruInterface(_ble.transport());
     }
 
     if (isSettingEnabled(setting_t::USB_THRU_DIN))
