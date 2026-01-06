@@ -1151,11 +1151,21 @@ std::optional<uint8_t> Midi::sysConfigSet(sys::Config::Section::global_t section
         case io::common::initAction_t::INIT:
         {
             _serial.init();
+
+            if (isSettingEnabled(setting_t::SEND_MIDI_CLOCK_DIN) && _clockTimerAllocated)
+            {
+                core::mcu::timers::start(_clockTimerIndex);
+            }
         }
         break;
 
         case io::common::initAction_t::DE_INIT:
         {
+            if (isSettingEnabled(setting_t::SEND_MIDI_CLOCK_DIN) && _clockTimerAllocated)
+            {
+                core::mcu::timers::stop(_clockTimerIndex);
+            }
+
             _serial.deInit();
         }
         break;
