@@ -86,7 +86,7 @@ Midi::Midi(HwaUsb&    hwaUSB,
 
                               case messaging::systemMessage_t::MIDI_BPM_CHANGE:
                               {
-                                  if (isSettingEnabled(setting_t::DIN_ENABLED) && _clockTimerAllocated)
+                                  if (isSettingEnabled(setting_t::DIN_ENABLED) && isSettingEnabled(setting_t::SEND_MIDI_CLOCK_DIN) && _clockTimerAllocated)
                                   {
                                       core::mcu::timers::setPeriod(_clockTimerIndex, Bpm.bpmToUsec(Bpm.value()));
                                       core::mcu::timers::start(_clockTimerIndex);
