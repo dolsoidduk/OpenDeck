@@ -22,7 +22,7 @@ limitations under the License.
 
 namespace io::encoders
 {
-    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS / 2>
+    class Collection : public io::common::BaseCollection<PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS>
     {
         public:
         Collection() = delete;

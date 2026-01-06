@@ -5,8 +5,14 @@ then
     {
         printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_DIGITAL_INPUTS)"
         printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_BUTTONS)"
-        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_ENCODERS)"
     } >> "$out_cmakelists"
+
+    encoders_supported=$($yaml_parser "$yaml_file" buttons.encoders)
+
+    if [[ $encoders_supported != "false" ]]
+    then
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORT_ENCODERS)" >> "$out_cmakelists"
+    fi
 
     digital_in_type=$($yaml_parser "$yaml_file" buttons.type)
 
@@ -267,14 +273,29 @@ then
 
         {
             printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_INDEXING_BUTTONS)"
-            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS=$nr_of_digital_inputs)"
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_BUTTONS=$nr_of_digital_inputs)"
         } >> "$out_cmakelists"
+
+        if [[ $encoders_supported != "false" ]]
+        then
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS=$((nr_of_digital_inputs / 2)))" >> "$out_cmakelists"
+        else
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS=0)" >> "$out_cmakelists"
+        fi
     else
-        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS=$nr_of_digital_inputs)" >> "$out_cmakelists"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_BUTTONS=$nr_of_digital_inputs)" >> "$out_cmakelists"
+
+        if [[ $encoders_supported != "false" ]]
+        then
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS=$((nr_of_digital_inputs / 2)))" >> "$out_cmakelists"
+        else
+            printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS=0)" >> "$out_cmakelists"
+        fi
     fi
 else
     {
         printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_MAX_NR_OF_DIGITAL_INPUTS=0)"
-        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_DIGITAL_INPUTS=0)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_BUTTONS=0)"
+        printf "%s\n" "list(APPEND $cmake_defines_var PROJECT_TARGET_SUPPORTED_NR_OF_ENCODERS=0)"
     } >> "$out_cmakelists"
 fi
