@@ -92,6 +92,8 @@ void Analog::updateSingle(size_t index, bool forceRefresh)
             return;
         }
 
+        processSaxBreathController(index, value);
+
         processReading(index, value);
     }
     else
@@ -108,6 +110,80 @@ void Analog::updateSingle(size_t index, bool forceRefresh)
             sendMessage(index, descriptor);
         }
     }
+}
+
+void Analog::processSaxBreathController(size_t index, uint16_t value)
+{
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+    const bool enabled = _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                                        sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE);
+
+    if (!enabled)
+    {
+        _lastBreathValue = 0xFF;
+        return;
+    }
+
+    const uint32_t configuredIndex = _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                                                    sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX);
+
+    if (configuredIndex != index)
+    {
+        return;
+    }
+
+    if (index >= Collection::SIZE(GROUP_ANALOG_INPUTS))
+    {
+        return;
+    }
+
+    const uint8_t bits      = _hwa.adcBits();
+    const uint32_t maxAdc   = (bits >= 31) ? 0x7FFFFFFFu : ((1u << bits) - 1u);
+    const uint32_t mid      = maxAdc / 2u;
+    const uint32_t raw      = value;
+    const uint32_t delta    = (raw > mid) ? (raw - mid) : 0u;
+    const uint32_t span     = (maxAdc > mid) ? (maxAdc - mid) : 1u;
+
+    uint32_t scaled = (delta * 127u) / span;
+    if (scaled > 127u)
+    {
+        scaled = 127u;
+    }
+
+    const uint8_t ccValue = static_cast<uint8_t>(scaled);
+    if (ccValue == _lastBreathValue)
+    {
+        return;
+    }
+
+    messaging::Event event = {};
+    event.message          = protocol::midi::messageType_t::CONTROL_CHANGE;
+    event.value            = ccValue;
+    event.channel          = 1;
+
+    const uint32_t ccNumber = _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                                             sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC);
+
+    if (ccNumber == 13)
+    {
+        // Send both CC2 + CC11
+        event.index = 2;
+        MidiDispatcher.notify(messaging::eventType_t::ANALOG, event);
+        event.index = 11;
+        MidiDispatcher.notify(messaging::eventType_t::ANALOG, event);
+    }
+    else
+    {
+        // Default to CC2 if anything else is stored
+        event.index = (ccNumber == 11) ? 11 : 2;
+        MidiDispatcher.notify(messaging::eventType_t::ANALOG, event);
+    }
+
+    _lastBreathValue = ccValue;
+#else
+    static_cast<void>(index);
+    static_cast<void>(value);
+#endif
 }
 
 void Analog::updateAll(bool forceRefresh)

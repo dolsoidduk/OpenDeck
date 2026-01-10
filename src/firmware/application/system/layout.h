@@ -83,7 +83,7 @@ namespace sys
             {
                 io::buttons::Collection::SIZE(),
                 0,
-                127,
+                16383,
             },
 
             // channel section

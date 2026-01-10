@@ -21,6 +21,7 @@ limitations under the License.
 #include "application/io/analog/common.h"
 #include "application/io/leds/common.h"
 #include "application/protocol/midi/common.h"
+#include "application/system/config.h"
 
 using namespace database;
 using namespace io;
@@ -32,6 +33,18 @@ void Admin::customInitGlobal()
 {
     // set global channel to 1
     update(Config::Section::global_t::MIDI_SETTINGS, midi::setting_t::GLOBAL_CHANNEL, 1);
+
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+    // Enable register-key chromatic sax mode by default for this target.
+    // 60 = C4
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE, 1);
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE, 60);
+
+    // MPXV7002DP breath controller (optional)
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE, 0);
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX, 7);
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC, 2);
+#endif
 }
 
 void Admin::customInitButtons()

@@ -25,7 +25,7 @@ limitations under the License.
 
 namespace io::analog
 {
-    using Database = database::User<database::Config::Section::analog_t>;
+    using Database = database::User<database::Config::Section::analog_t, database::Config::Section::system_t>;
 
     class Hwa
     {

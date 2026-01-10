@@ -73,9 +73,11 @@ namespace io::analog
         Database& _database;
         uint8_t   _fsrPressed[Collection::SIZE() / 8 + 1] = {};
         uint16_t  _lastValue[Collection::SIZE()]          = {};
+        uint8_t   _lastBreathValue                        = 0xFF;
 
         void                   fillDescriptor(size_t index, Descriptor& descriptor);
         void                   processReading(size_t index, uint16_t value);
+        void                   processSaxBreathController(size_t index, uint16_t value);
         bool                   checkPotentiometerValue(size_t index, Descriptor& descriptor);
         bool                   checkFSRvalue(size_t index, Descriptor& descriptor);
         void                   sendMessage(size_t index, Descriptor& descriptor);

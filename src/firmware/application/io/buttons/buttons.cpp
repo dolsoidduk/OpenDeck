@@ -28,6 +28,10 @@ limitations under the License.
 #include "core/mcu.h"
 #include "core/util/util.h"
 
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+#include "application/protocol/midi/common.h"
+#endif
+
 using namespace io::buttons;
 using namespace protocol;
 
@@ -193,12 +197,27 @@ void Buttons::processButton(size_t index, bool reading, Descriptor& descriptor)
 
     setState(index, reading);
 
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+    // Optional sax register-key chromatic mode.
+    // When enabled, digital button events are combined into a single monophonic note stream.
+    if (index < Collection::SIZE(GROUP_DIGITAL_INPUTS))
+    {
+        if (_database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                           sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE))
+        {
+            processSaxRegisterChromatic();
+            return;
+        }
+    }
+#endif
+
     // don't process messageType_t::NONE type of message
     if (descriptor.messageType != messageType_t::NONE)
     {
         bool send = true;
 
-        if (descriptor.type == type_t::LATCHING)
+        // NOTE_LEGATO always acts as MOMENTARY (process both press and release)
+        if (descriptor.type == type_t::LATCHING && descriptor.messageType != messageType_t::NOTE_LEGATO)
         {
             // act on press only
             if (reading)
@@ -228,6 +247,254 @@ void Buttons::processButton(size_t index, bool reading, Descriptor& descriptor)
     }
 }
 
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+uint8_t Buttons::saxChannel() const
+{
+    // Use global channel (1-16). If set to OMNI or invalid, fall back to channel 1.
+    const auto raw = static_cast<uint8_t>(
+        _database.read(database::Config::Section::global_t::MIDI_SETTINGS,
+                       protocol::midi::setting_t::GLOBAL_CHANNEL));
+
+    if (raw >= 1 && raw <= 16)
+    {
+        return raw - 1;
+    }
+
+    return 0;
+}
+
+void Buttons::processSaxRegisterChromatic()
+{
+    const auto base = static_cast<uint8_t>(
+        _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                       sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE));
+
+    const bool invertInputs = _database.read(
+        database::Config::Section::system_t::SYSTEM_SETTINGS,
+        sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT);
+
+    int32_t    activeKey    = -1;
+    const auto digitalCount = Collection::SIZE(GROUP_DIGITAL_INPUTS);
+    const auto saxKeyCount  = (digitalCount < 24U) ? digitalCount : 24U;
+
+    const auto saxPressed = [this, invertInputs](size_t index)
+    {
+        const bool pressed = state(index);
+        return invertInputs ? !pressed : pressed;
+    };
+
+    // Priority: highest pressed index (deterministic).
+    for (int32_t i = static_cast<int32_t>(digitalCount) - 1; i >= 0; i--)
+    {
+        if (saxPressed(static_cast<size_t>(i)))
+        {
+            activeKey = i;
+            break;
+        }
+    }
+
+    const uint8_t channel = saxChannel();
+
+    // Build current fingering mask from first 24 digital keys.
+    uint32_t currentMask = 0;
+    for (size_t i = 0; i < saxKeyCount; i++)
+    {
+        if (saxPressed(i))
+        {
+            currentMask |= (1UL << i);
+        }
+    }
+
+    const auto popcount32 = [](uint32_t v)
+    {
+        uint8_t c = 0;
+        while (v)
+        {
+            c += static_cast<uint8_t>(v & 1U);
+            v >>= 1U;
+        }
+        return c;
+    };
+
+    // Fingering table mode if any entry is enabled.
+    bool     anyEnabled = false;
+    bool     hasMatch   = false;
+    uint8_t  bestScore  = 0;
+    uint8_t  bestNote   = 0;
+
+    for (size_t entry = 0; entry < database::Config::SAX_FINGERING_TABLE_ENTRIES; entry++)
+    {
+        const uint16_t hiEn = static_cast<uint16_t>(
+            _database.read(database::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE, entry));
+
+        const bool enabled = (hiEn & (1U << 10)) != 0;
+        if (!enabled)
+        {
+            continue;
+        }
+
+        anyEnabled = true;
+
+        const uint16_t lo14 = static_cast<uint16_t>(
+            _database.read(database::Config::Section::global_t::SAX_FINGERING_MASK_LO14, entry));
+
+        const uint16_t hi10 = static_cast<uint16_t>(hiEn & 0x03FF);
+        uint32_t       mask = static_cast<uint32_t>(lo14) | (static_cast<uint32_t>(hi10) << 14);
+
+        // ignore bits outside of 24 keys
+        if (saxKeyCount < 24U)
+        {
+            const uint32_t allowedMask = (saxKeyCount == 0U) ? 0U : ((1UL << saxKeyCount) - 1UL);
+            mask &= allowedMask;
+        }
+        else
+        {
+            mask &= 0x00FFFFFFUL;
+        }
+
+        if ((mask & currentMask) != mask)
+        {
+            continue;
+        }
+
+        const uint8_t score = popcount32(mask);
+        if (!hasMatch || score > bestScore)
+        {
+            const uint16_t noteWide = static_cast<uint16_t>(
+                _database.read(database::Config::Section::global_t::SAX_FINGERING_NOTE, entry));
+            if (noteWide > 127)
+            {
+                continue;
+            }
+
+            bestScore = score;
+            bestNote  = static_cast<uint8_t>(noteWide);
+            hasMatch  = true;
+        }
+    }
+
+    if (anyEnabled)
+    {
+        // If table is enabled, note is driven purely by the matched fingering.
+        if (!hasMatch || currentMask == 0)
+        {
+            if (_saxNoteOn)
+            {
+                messaging::Event event = {};
+                event.componentIndex   = 0;
+                event.channel          = channel;
+                event.index            = _saxActiveNote;
+                event.value            = 0;
+                event.message          = midi::messageType_t::NOTE_OFF;
+
+                MidiDispatcher.notify(messaging::eventType_t::BUTTON, event);
+                _saxNoteOn = false;
+            }
+
+            return;
+        }
+
+        const uint8_t newNote = bestNote;
+
+        if (_saxNoteOn && _saxActiveNote == newNote)
+        {
+            return;
+        }
+
+        if (_saxNoteOn)
+        {
+            messaging::Event offEvent = {};
+            offEvent.componentIndex   = 0;
+            offEvent.channel          = channel;
+            offEvent.index            = _saxActiveNote;
+            offEvent.value            = 0;
+            offEvent.message          = midi::messageType_t::NOTE_OFF;
+            MidiDispatcher.notify(messaging::eventType_t::BUTTON, offEvent);
+        }
+
+        messaging::Event onEvent = {};
+        onEvent.componentIndex   = 0;
+        onEvent.channel          = channel;
+        onEvent.index            = newNote;
+        onEvent.value            = 127;
+        onEvent.message          = midi::messageType_t::NOTE_ON;
+        MidiDispatcher.notify(messaging::eventType_t::BUTTON, onEvent);
+
+        _saxActiveNote = newNote;
+        _saxNoteOn     = true;
+        return;
+    }
+
+    // Legacy mode (no fingering table entries enabled): keep existing behavior.
+    if (activeKey < 0)
+    {
+        if (_saxNoteOn)
+        {
+            messaging::Event event = {};
+            event.componentIndex   = 0;
+            event.channel          = channel;
+            event.index            = _saxActiveNote;
+            event.value            = 0;
+            event.message          = midi::messageType_t::NOTE_OFF;
+
+            MidiDispatcher.notify(messaging::eventType_t::BUTTON, event);
+            _saxNoteOn = false;
+        }
+
+        return;
+    }
+
+    const uint8_t mapRaw = static_cast<uint8_t>(
+        _database.read(database::Config::Section::button_t::SAX_REGISTER_KEY_MAP,
+                       static_cast<size_t>(activeKey)));
+
+    uint16_t mappedKey = (mapRaw == 0)
+                             ? static_cast<uint16_t>(activeKey)
+                             : static_cast<uint16_t>(mapRaw - 1);
+
+    // If mapping points outside of available digital inputs, fall back to identity.
+    if (mappedKey >= digitalCount)
+    {
+        mappedKey = static_cast<uint16_t>(activeKey);
+    }
+
+    uint16_t noteWide = static_cast<uint16_t>(base) + mappedKey;
+    if (noteWide > 127)
+    {
+        noteWide = 127;
+    }
+
+    const uint8_t newNote = static_cast<uint8_t>(noteWide);
+
+    if (_saxNoteOn && _saxActiveNote == newNote)
+    {
+        return;
+    }
+
+    if (_saxNoteOn)
+    {
+        messaging::Event offEvent = {};
+        offEvent.componentIndex   = 0;
+        offEvent.channel          = channel;
+        offEvent.index            = _saxActiveNote;
+        offEvent.value            = 0;
+        offEvent.message          = midi::messageType_t::NOTE_OFF;
+        MidiDispatcher.notify(messaging::eventType_t::BUTTON, offEvent);
+    }
+
+    messaging::Event onEvent = {};
+    onEvent.componentIndex   = 0;
+    onEvent.channel          = channel;
+    onEvent.index            = newNote;
+    onEvent.value            = 127;
+    onEvent.message          = midi::messageType_t::NOTE_ON;
+    MidiDispatcher.notify(messaging::eventType_t::BUTTON, onEvent);
+
+    _saxActiveNote = newNote;
+    _saxNoteOn     = true;
+}
+#endif
+
 /// Used to send MIDI message from specified button.
 /// Used internally once the button state has been changed and processed.
 /// param [in]: index           Button index which sends the message.
@@ -256,6 +523,39 @@ void Buttons::sendMessage(size_t index, bool state, Descriptor& descriptor)
         case messageType_t::MMC_RECORD:
         case messageType_t::MMC_PLAY_STOP:
             break;
+
+        case messageType_t::NOTE_LEGATO:
+        {
+            // Monophonic legato: last-note priority
+            // On press: send Note On for the new note, and send Note Off for the previous active note
+            // so only one note is active per channel.
+
+            uint8_t channel = descriptor.event.channel & 0x0F;
+            uint8_t newNote = descriptor.event.index & 0x7F;
+
+            // Increment pressed count for this channel
+            _legatoButtonCount[channel]++;
+
+            // If there was an active note on this channel and it's different, turn it off
+            if (_legatoButtonCount[channel] > 1)
+            {
+                uint8_t prevNote = _legatoActiveNote[channel];
+                if (prevNote != newNote)
+                {
+                    messaging::Event offEvent = descriptor.event;
+                    offEvent.index            = prevNote;
+                    offEvent.value            = 0;
+                    offEvent.message          = midi::messageType_t::NOTE_OFF;
+
+                    MidiDispatcher.notify(eventType, offEvent);
+                }
+            }
+
+            // Update active note to the newly pressed one and ensure Note On
+            _legatoActiveNote[channel] = newNote;
+            descriptor.event.message   = midi::messageType_t::NOTE_ON;
+        }
+        break;
 
         case messageType_t::PROGRAM_CHANGE:
         {
@@ -394,6 +694,62 @@ void Buttons::sendMessage(size_t index, bool state, Descriptor& descriptor)
         }
         break;
 
+        case messageType_t::BANK_SELECT_PROGRAM_CHANGE:
+        {
+            // MIDI Bank Select + Program Change
+            // -----------------------------------
+            // Implements the standard MIDI Bank/Program Change protocol.
+            // This message expands into 3 sequential MIDI messages:
+            //
+            // 1) CC#0  (Bank Select MSB) - Upper 7 bits of 14-bit bank number
+            // 2) CC#32 (Bank Select LSB) - Lower 7 bits of 14-bit bank number
+            // 3) Program Change          - Program number from MIDI_ID (0-127)
+            //
+            // Configuration:
+            //   - MIDI_ID: Program Change number (0-127)
+            //   - VALUE:   14-bit Bank number (0-16383)
+            //              Bank MSB = VALUE >> 7
+            //              Bank LSB = VALUE & 0x7F
+            //   - Channel: MIDI channel (1-16)
+            //
+            // Example: Bank 3:7 (MSB=3, LSB=7) + Program 12
+            //   VALUE = (3 << 7) | 7 = 391
+            //   MIDI_ID = 12
+            //   Result: CC#0=3, CC#32=7, PC=12
+            //
+            // Total addressable space: 16,384 banks × 128 programs = 2,097,152 presets
+            // See MIDI_BANK_CHANGE_GUIDE.md for configuration examples.
+
+            const uint16_t bank    = descriptor.event.value & 0x3FFF;    // 14-bit bank (0-16383)
+            const uint8_t  bankMsb = (bank >> 7) & 0x7F;                 // Upper 7 bits
+            const uint8_t  bankLsb = bank & 0x7F;                        // Lower 7 bits
+
+            // Send CC#0 (Bank Select MSB)
+            auto ccMsb    = descriptor.event;
+            ccMsb.message = midi::messageType_t::CONTROL_CHANGE;
+            ccMsb.index   = 0;
+            ccMsb.value   = bankMsb;
+            MidiDispatcher.notify(eventType, ccMsb);
+
+            // Send CC#32 (Bank Select LSB)
+            auto ccLsb    = descriptor.event;
+            ccLsb.message = midi::messageType_t::CONTROL_CHANGE;
+            ccLsb.index   = 32;
+            ccLsb.value   = bankLsb;
+            MidiDispatcher.notify(eventType, ccLsb);
+
+            // Send Program Change
+            auto pc    = descriptor.event;
+            pc.message = midi::messageType_t::PROGRAM_CHANGE;
+            pc.index &= 0x7F;
+            pc.value = 0;
+            MidiDispatcher.notify(eventType, pc);
+
+            // We've already dispatched all MIDI events.
+            send = false;
+        }
+        break;
+
         case messageType_t::PROGRAM_CHANGE_OFFSET_INC:
         {
             MidiProgram.incrementOffset(descriptor.event.value);
@@ -454,6 +810,34 @@ void Buttons::sendMessage(size_t index, bool state, Descriptor& descriptor)
         {
             descriptor.event.value   = 0;
             descriptor.event.message = midi::messageType_t::NOTE_OFF;
+        }
+        break;
+
+        case messageType_t::NOTE_LEGATO:
+        {
+            // Monophonic legato: final release turns off the current active note only
+            uint8_t channel = descriptor.event.channel & 0x0F;
+
+            if (_legatoButtonCount[channel] > 0)
+            {
+                _legatoButtonCount[channel]--;
+            }
+
+            if (_legatoButtonCount[channel] == 0)
+            {
+                // No buttons held anymore on this channel - turn off the active note
+                descriptor.event.index   = _legatoActiveNote[channel];
+                descriptor.event.value   = 0;
+                descriptor.event.message = midi::messageType_t::NOTE_OFF;
+
+                // Clear active note marker (optional)
+                _legatoActiveNote[channel] = 0;
+            }
+            else
+            {
+                // Still other buttons pressed - suppress Note Off
+                send = false;
+            }
         }
         break;
 
@@ -555,49 +939,6 @@ void Buttons::fillDescriptor(size_t index, Descriptor& descriptor)
     descriptor.event.channel        = _database.read(database::Config::Section::button_t::CHANNEL, index);
     descriptor.event.index          = _database.read(database::Config::Section::button_t::MIDI_ID, index);
     descriptor.event.value          = _database.read(database::Config::Section::button_t::VALUE, index);
-
-    // overwrite type under certain conditions
-    switch (descriptor.messageType)
-    {
-    case messageType_t::PROGRAM_CHANGE:
-    case messageType_t::PROGRAM_CHANGE_INC:
-    case messageType_t::PROGRAM_CHANGE_DEC:
-    case messageType_t::MMC_PLAY:
-    case messageType_t::MMC_STOP:
-    case messageType_t::MMC_PAUSE:
-    case messageType_t::CONTROL_CHANGE:
-    case messageType_t::REAL_TIME_CLOCK:
-    case messageType_t::REAL_TIME_START:
-    case messageType_t::REAL_TIME_CONTINUE:
-    case messageType_t::REAL_TIME_STOP:
-    case messageType_t::REAL_TIME_ACTIVE_SENSING:
-    case messageType_t::REAL_TIME_SYSTEM_RESET:
-    case messageType_t::MULTI_VAL_INC_RESET_NOTE:
-    case messageType_t::MULTI_VAL_INC_DEC_NOTE:
-    case messageType_t::MULTI_VAL_INC_RESET_CC:
-    case messageType_t::MULTI_VAL_INC_DEC_CC:
-    case messageType_t::PRESET_CHANGE:
-    case messageType_t::PROGRAM_CHANGE_OFFSET_INC:
-    case messageType_t::PROGRAM_CHANGE_OFFSET_DEC:
-    case messageType_t::NOTE_OFF_ONLY:
-    case messageType_t::CONTROL_CHANGE0_ONLY:
-    case messageType_t::BPM_INC:
-    case messageType_t::BPM_DEC:
-    {
-        descriptor.type = type_t::MOMENTARY;
-    }
-    break;
-
-    case messageType_t::MMC_RECORD:
-    case messageType_t::MMC_PLAY_STOP:
-    {
-        descriptor.type = type_t::LATCHING;
-    }
-    break;
-
-    default:
-        break;
-    }
 
     descriptor.event.message = INTERNAL_MSG_TO_MIDI_TYPE[static_cast<uint8_t>(descriptor.messageType)];
 }

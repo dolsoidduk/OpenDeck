@@ -30,6 +30,7 @@ namespace database
 
         static constexpr size_t MAX_PRESETS                = 10;
         static constexpr size_t MAX_CUSTOM_SYSTEM_SETTINGS = 10;
+        static constexpr size_t SAX_FINGERING_TABLE_ENTRIES = 128;
 
         enum class block_t : uint8_t
         {
@@ -57,6 +58,9 @@ namespace database
             enum class global_t : uint8_t
             {
                 MIDI_SETTINGS,
+                SAX_FINGERING_MASK_LO14,
+                SAX_FINGERING_MASK_HI10_ENABLE,
+                SAX_FINGERING_NOTE,
                 AMOUNT
             };
 
@@ -67,6 +71,7 @@ namespace database
                 MIDI_ID,
                 VALUE,
                 CHANNEL,
+                SAX_REGISTER_KEY_MAP,
                 AMOUNT
             };
 

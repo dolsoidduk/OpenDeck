@@ -55,6 +55,9 @@ namespace sys
                 MIDI_SETTINGS,
                 RESERVED,    // compatibility
                 SYSTEM_SETTINGS,
+                SAX_FINGERING_MASK_LO14,
+                SAX_FINGERING_MASK_HI10_ENABLE,
+                SAX_FINGERING_NOTE,
                 AMOUNT
             };
 
@@ -65,6 +68,7 @@ namespace sys
                 MIDI_ID,
                 VALUE,
                 CHANNEL,
+                SAX_REGISTER_KEY_MAP,
                 AMOUNT
             };
 
@@ -143,6 +147,16 @@ namespace sys
             PRESET_PRESERVE                            = static_cast<uint8_t>(database::Config::systemSetting_t::PRESET_PRESERVE),
             DISABLE_FORCED_REFRESH_AFTER_PRESET_CHANGE = static_cast<uint8_t>(database::Config::systemSetting_t::CUSTOM_SYSTEM_SETTING_START),
             ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN,
+            // Saxophone-related settings (stored in custom system settings)
+            // These are optional and may be ignored by targets which don't enable the feature.
+            SAX_REGISTER_CHROMATIC_ENABLE = static_cast<uint8_t>(database::Config::systemSetting_t::CUSTOM_SYSTEM_SETTING_START) + 2,
+            SAX_REGISTER_CHROMATIC_BASE_NOTE,
+            SAX_BREATH_CONTROLLER_ENABLE,
+            SAX_BREATH_CONTROLLER_ANALOG_INDEX,
+            SAX_BREATH_CONTROLLER_CC,
+            // When enabled, logical pressed state is inverted for sax register chromatic processing.
+            // Useful for active-low sensors (e.g. open-drain Hall switches).
+            SAX_REGISTER_CHROMATIC_INPUT_INVERT = static_cast<uint8_t>(database::Config::systemSetting_t::CUSTOM_SYSTEM_SETTING_START) + 7,
             AMOUNT
         };
 

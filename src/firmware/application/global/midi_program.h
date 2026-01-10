@@ -23,6 +23,29 @@ limitations under the License.
 
 namespace global
 {
+    /// MIDI Program Change Management
+    /// -------------------------------
+    /// Manages Program Change values per MIDI channel with global offset support.
+    /// 
+    /// Features:
+    ///   - Per-channel Program Change tracking (channels 1-16)
+    ///   - Global Program Change Offset (0-127)
+    ///   - Increment/Decrement operations with boundary checking
+    ///   - Automatic offset application on Program Change transmission
+    ///
+    /// Program Change Offset:
+    ///   The offset is added to the base Program Change value before transmission.
+    ///   This allows controlling multiple banks of 128 programs without reconfiguring buttons.
+    ///   
+    ///   Example:
+    ///     - Button configured as Program 10
+    ///     - Offset = 0:  Sends PC 10
+    ///     - Offset = 32: Sends PC 42 (10 + 32)
+    ///     - Offset = 64: Sends PC 74 (10 + 64)
+    ///
+    /// Usage:
+    ///   See MIDI_BANK_CHANGE_GUIDE.md for configuration examples.
+    ///   See buttons::messageType_t::BANK_SELECT_PROGRAM_CHANGE for Bank Select support.
     class MidiProgram
     {
         public:

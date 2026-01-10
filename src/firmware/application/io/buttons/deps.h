@@ -25,7 +25,9 @@ limitations under the License.
 namespace io::buttons
 {
     using Database = database::User<database::Config::Section::button_t,
-                                    database::Config::Section::encoder_t>;
+                                    database::Config::Section::encoder_t,
+                                    database::Config::Section::global_t,
+                                    database::Config::Section::system_t>;
 
     class Hwa
     {

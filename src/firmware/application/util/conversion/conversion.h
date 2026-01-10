@@ -76,6 +76,9 @@ namespace util
             database::Config::Section::global_t::MIDI_SETTINGS,
             database::Config::Section::global_t::AMOUNT,    // blank/reserved
             database::Config::Section::global_t::AMOUNT,    // unused
+            database::Config::Section::global_t::SAX_FINGERING_MASK_LO14,
+            database::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE,
+            database::Config::Section::global_t::SAX_FINGERING_NOTE,
         };
 
         static constexpr database::Config::Section::button_t SYS_EX2_DB_BUTTON[static_cast<uint8_t>(sys::Config::Section::button_t::AMOUNT)] = {
@@ -83,7 +86,8 @@ namespace util
             database::Config::Section::button_t::MESSAGE_TYPE,
             database::Config::Section::button_t::MIDI_ID,
             database::Config::Section::button_t::VALUE,
-            database::Config::Section::button_t::CHANNEL
+            database::Config::Section::button_t::CHANNEL,
+            database::Config::Section::button_t::SAX_REGISTER_KEY_MAP
         };
 
         static constexpr database::Config::Section::encoder_t SYS_EX2_DB_ENCODER[static_cast<uint8_t>(sys::Config::Section::encoder_t::AMOUNT)] = {

@@ -625,52 +625,156 @@ void System::DatabaseHandlers::factoryResetDone()
 
 std::optional<uint8_t> System::sysConfigGet(sys::Config::Section::global_t section, size_t index, uint16_t& value)
 {
-    if (section != sys::Config::Section::global_t::SYSTEM_SETTINGS)
+    if (section == sys::Config::Section::global_t::SYSTEM_SETTINGS)
     {
-        return std::nullopt;
+        switch (index)
+        {
+        case static_cast<size_t>(sys::Config::systemSetting_t::DISABLE_FORCED_REFRESH_AFTER_PRESET_CHANGE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT):
+            break;
+
+        default:
+            return std::nullopt;
+        }
+
+        uint32_t readValue;
+
+        auto result = _components.database().read(database::Config::Section::system_t::SYSTEM_SETTINGS, index, readValue)
+                          ? sys::Config::Status::ACK
+                          : sys::Config::Status::ERROR_READ;
+
+        value = readValue;
+        return result;
     }
 
-    switch (index)
+    if ((section == sys::Config::Section::global_t::SAX_FINGERING_MASK_LO14) ||
+        (section == sys::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE) ||
+        (section == sys::Config::Section::global_t::SAX_FINGERING_NOTE))
     {
-    case static_cast<size_t>(sys::Config::systemSetting_t::DISABLE_FORCED_REFRESH_AFTER_PRESET_CHANGE):
-    case static_cast<size_t>(sys::Config::systemSetting_t::ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN):
-        break;
+        if (index >= database::Config::SAX_FINGERING_TABLE_ENTRIES)
+        {
+            return sys::Config::Status::ERROR_INDEX;
+        }
 
-    default:
-        return std::nullopt;
+        uint32_t readValue;
+
+        auto result = _components.database().read(util::Conversion::SYS_2_DB_SECTION(section), index, readValue)
+                          ? sys::Config::Status::ACK
+                          : sys::Config::Status::ERROR_READ;
+
+        value = readValue;
+        return result;
     }
 
-    uint32_t readValue;
-
-    auto result = _components.database().read(database::Config::Section::system_t::SYSTEM_SETTINGS, index, readValue)
-                      ? sys::Config::Status::ACK
-                      : sys::Config::Status::ERROR_READ;
-
-    value = readValue;
-
-    return result;
+    return std::nullopt;
 }
 
 std::optional<uint8_t> System::sysConfigSet(sys::Config::Section::global_t section, size_t index, uint16_t value)
 {
-    if (section != sys::Config::Section::global_t::SYSTEM_SETTINGS)
+    if (section == sys::Config::Section::global_t::SYSTEM_SETTINGS)
     {
-        return std::nullopt;
+        switch (index)
+        {
+        case static_cast<size_t>(sys::Config::systemSetting_t::DISABLE_FORCED_REFRESH_AFTER_PRESET_CHANGE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN):
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE):
+            if (value > 1)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE):
+            if (value > 127)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE):
+            if (value > 1)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX):
+            // 0..255 (actual available range depends on target)
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC):
+            // Allow only CC2 (Breath) or CC11 (Expression)
+            // 13 is treated as "send both CC2 + CC11"
+            if (value != 2 && value != 11 && value != 13)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT):
+            if (value > 1)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        default:
+            return std::nullopt;
+        }
+
+        auto result = _components.database().update(database::Config::Section::system_t::SYSTEM_SETTINGS, index, value)
+                          ? sys::Config::Status::ACK
+                          : sys::Config::Status::ERROR_WRITE;
+
+        return result;
     }
 
-    switch (index)
+    if ((section == sys::Config::Section::global_t::SAX_FINGERING_MASK_LO14) ||
+        (section == sys::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE) ||
+        (section == sys::Config::Section::global_t::SAX_FINGERING_NOTE))
     {
-    case static_cast<size_t>(sys::Config::systemSetting_t::DISABLE_FORCED_REFRESH_AFTER_PRESET_CHANGE):
-    case static_cast<size_t>(sys::Config::systemSetting_t::ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN):
-        break;
+        if (index >= database::Config::SAX_FINGERING_TABLE_ENTRIES)
+        {
+            return sys::Config::Status::ERROR_INDEX;
+        }
 
-    default:
-        return std::nullopt;
+        if (section == sys::Config::Section::global_t::SAX_FINGERING_MASK_LO14)
+        {
+            if (value > 16383)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+        }
+        else if (section == sys::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE)
+        {
+            // 10 bits mask high + enable bit10
+            if (value > 2047)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+        }
+        else
+        {
+            if (value > 127)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+        }
+
+        auto result = _components.database().update(util::Conversion::SYS_2_DB_SECTION(section), index, value)
+                          ? sys::Config::Status::ACK
+                          : sys::Config::Status::ERROR_WRITE;
+
+        return result;
     }
 
-    auto result = _components.database().update(database::Config::Section::system_t::SYSTEM_SETTINGS, index, value)
-                      ? sys::Config::Status::ACK
-                      : sys::Config::Status::ERROR_WRITE;
-
-    return result;
+    return std::nullopt;
 }

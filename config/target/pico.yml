@@ -29,53 +29,80 @@
           port: "0"
           index: 17
   buttons:
-    type: "native"
-    extPullups: false
+    type: "shiftRegister"
+    shiftRegisters: 4
+    encoders: false
     pins:
-    -
-      port: "0"
-      index: 2
-    -
-      port: "0"
-      index: 3
-    -
-      port: "0"
-      index: 6
-    -
-      port: "0"
-      index: 7
-    -
-      port: "0"
-      index: 8
-    -
-      port: "0"
-      index: 9
-    -
-      port: "0"
-      index: 10
-    -
-      port: "0"
-      index: 11
-    -
-      port: "0"
-      index: 12
-    -
-      port: "0"
-      index: 13
+      data:
+        port: "0"
+        index: 6
+      clock:
+        port: "0"
+        index: 7
+      latch:
+        port: "0"
+        index: 8
+    indexing:
+    - 0
+    - 1
+    - 2
+    - 3
+    - 4
+    - 5
+    - 6
+    - 7
+    - 8
+    - 9
+    - 10
+    - 11
+    - 12
+    - 13
+    - 14
+    - 15
+    - 16
+    - 17
+    - 18
+    - 19
+    - 20
+    - 21
+    - 22
+    - 23
+    - 24
+    - 25
+    - 26
+    - 27
+    - 28
+    - 29
+    - 30
+    - 31
   analog:
-    type: "native"
+    type: "4051"
     inputVoltage: "3.3"
+    multiplexers: 1
     pins:
-    -
-      port: "0"
-      index: 26
-    -
-      port: "0"
-      index: 27
-    -
-      port: "0"
-      index: 28
+      s0:
+        port: "0"
+        index: 9
+      s1:
+        port: "0"
+        index: 10
+      s2:
+        port: "0"
+        index: 11
+      z0:
+        port: "0"
+        index: 26
   leds:
+    internal:
+      invert: false
+      pins:
+        usb:
+          rx:
+            port: "0"
+            index: 12
+          tx:
+            port: "0"
+            index: 13
     external:
       type: "native"
       pins:
@@ -100,4 +127,6 @@
       -
         port: "0"
         index: 18
+  saxophone:
+    registerChromatic: true
   test: true

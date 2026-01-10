@@ -104,6 +104,19 @@ For more details on supported boards, check the [wiki page](https://github.com/s
 
 Available on dedicated [Wiki section](https://github.com/shanteacontrols/OpenDeck/wiki/).
 
+### Guides
+
+* [OpenDeck Configuration Guide](OPENDECK_CONFIGURATION_GUIDE.md) - General setup and usage
+* [MIDI Bank Change Guide](MIDI_BANK_CHANGE_GUIDE.md) - Program Change, Bank Select MSB/LSB configuration
+* [BLE MIDI Configuration Guide](BLE_MIDI_CONFIGURATION_GUIDE.md) - Bluetooth MIDI setup
+* [BLE MIDI Quick Start](BLE_MIDI_QUICK_START.md) - Quick Bluetooth MIDI setup
+* [Saxophone Wind Controller MIDI Guide](SAXOPHONE_WIND_CONTROLLER_MIDI_GUIDE.md) - Wind controller configuration
+* [MPXV7002DP Breath Sensor Guide](MPXV7002DP_BREATH_SENSOR_GUIDE.md) - Breath sensor setup
+* [Saxophone Sensor Placement Guide](SAXOPHONE_SENSOR_PLACEMENT_GUIDE.md) - Sensor placement for wind controllers
+* [XIAO nRF52840 Breath Controller Setup](XIAO_NRF52840_BREATH_CONTROLLER_SETUP.md) - XIAO board breath controller
+* [OpenDeck UI Build Guide](OPENDECK_UI_BUILD_GUIDE.md) - Building the configuration UI
+* [OpenDeck UI Electron Build Guide](OPENDECK_UI_ELECTRON_BUILD_GUIDE.md) - Building Electron-based UI
+
 ## Discussion
 
 Need help? Want to show off your OpenDeck-based builds? Head over to [Discussions](https://github.com/shanteacontrols/OpenDeck/discussions)!

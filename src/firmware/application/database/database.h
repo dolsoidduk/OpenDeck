@@ -197,6 +197,14 @@ namespace database
             return value;
         }
 
+        template<typename I>
+        uint32_t read(Config::Section::system_t section, I index)
+        {
+            static_assert((std::is_same_v<Config::Section::system_t, sections> || ...),
+                          "database::User does not include system_t section");
+            return _admin.read(section, index);
+        }
+
         template<typename T, typename I>
         typename std::enable_if<(std::is_same_v<T, sections> || ...), bool>::type
         read(T section, I index, uint32_t& value)
@@ -206,6 +214,14 @@ namespace database
                                static_cast<uint8_t>(section),
                                static_cast<size_t>(index),
                                value);
+        }
+
+        template<typename I>
+        bool read(Config::Section::system_t section, I index, uint32_t& value)
+        {
+            static_assert((std::is_same_v<Config::Section::system_t, sections> || ...),
+                          "database::User does not include system_t section");
+            return _admin.read(section, index, value);
         }
 
         template<typename T, typename I, typename V>
@@ -219,6 +235,14 @@ namespace database
                                  static_cast<uint8_t>(section),
                                  static_cast<size_t>(index),
                                  newValue);
+        }
+
+        template<typename I, typename V>
+        bool update(Config::Section::system_t section, I index, V value)
+        {
+            static_assert((std::is_same_v<Config::Section::system_t, sections> || ...),
+                          "database::User does not include system_t section");
+            return _admin.update(section, index, value);
         }
 
         uint8_t getPreset()

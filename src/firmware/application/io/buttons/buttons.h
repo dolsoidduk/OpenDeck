@@ -24,6 +24,10 @@ limitations under the License.
 #include "application/system/config.h"
 #include "application/io/base.h"
 
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+#include "application/protocol/midi/common.h"
+#endif
+
 #include <optional>
 
 namespace io::buttons
@@ -76,12 +80,13 @@ namespace io::buttons
             protocol::midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_DEC_CC
             protocol::midi::messageType_t::NOTE_ON,                         // NOTE_OFF_ONLY
             protocol::midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE0_ONLY
-            protocol::midi::messageType_t::INVALID,                         // RESERVED
+            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
+            protocol::midi::messageType_t::INVALID,                         // BANK_SELECT_PROGRAM_CHANGE
             protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_INC
             protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_DEC
             protocol::midi::messageType_t::INVALID,                         // BPM_INC
             protocol::midi::messageType_t::INVALID,                         // BPM_DEC
-            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
+            protocol::midi::messageType_t::INVALID,                         // NOTE_LEGATO
         };
 
         Hwa&      _hwa;
@@ -90,6 +95,17 @@ namespace io::buttons
         uint8_t   _buttonPressed[Collection::SIZE() / 8 + 1]     = {};
         uint8_t   _lastLatchingState[Collection::SIZE() / 8 + 1] = {};
         uint8_t   _incDecValue[Collection::SIZE()]               = {};
+
+        uint8_t _legatoActiveNote[16]  = {};
+        uint8_t _legatoButtonCount[16] = {};
+
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+        uint8_t _saxActiveNote = 0;
+        bool    _saxNoteOn     = false;
+
+        void    processSaxRegisterChromatic();
+        uint8_t saxChannel() const;
+#endif
 
         bool                   state(size_t index);
         bool                   state(size_t index, uint8_t& numberOfReadings, uint16_t& states);
