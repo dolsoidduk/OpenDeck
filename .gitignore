@@ -13,3 +13,6 @@ build/
 ccache/*
 release/*
 .west-updated
+
+# UI workspace is a separate git repo.
+opendeckui/
