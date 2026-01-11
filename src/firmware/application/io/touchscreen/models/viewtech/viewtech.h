@@ -53,6 +53,16 @@ namespace io::touchscreen
             64
         };
 
-        Hwa& _hwa;
+        Hwa&     _hwa;
+        bool     _postInitPending        = false;
+        uint32_t _postInitReadyAtMs      = 0;
+        bool     _pendingScreenValid     = false;
+        size_t   _pendingScreenIndex     = 0;
+        bool     _pendingBrightnessValid = false;
+        brightness_t _pendingBrightness  = static_cast<brightness_t>(0);
+
+        void maybeFinishPostInit();
+        void sendScreen(size_t index);
+        void sendBrightness(brightness_t brightness);
     };
 }    // namespace io::touchscreen

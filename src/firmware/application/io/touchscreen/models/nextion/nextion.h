@@ -72,6 +72,15 @@ namespace io::touchscreen
         char   _commandBuffer[Model::BUFFER_SIZE];
         size_t _endCounter = 0;
 
+        bool     _postInitPending        = false;
+        uint32_t _postInitReadyAtMs      = 0;
+        bool     _pendingScreenValid     = false;
+        size_t   _pendingScreenIndex     = 0;
+        bool     _pendingBrightnessValid = false;
+        brightness_t _pendingBrightness  = static_cast<brightness_t>(0);
+
+        void maybeFinishPostInit();
+
         bool      writeCommand(const char* line, ...);
         bool      endCommand();
         tsEvent_t response(Data& data);

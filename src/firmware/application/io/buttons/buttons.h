@@ -80,13 +80,14 @@ namespace io::buttons
             protocol::midi::messageType_t::CONTROL_CHANGE,                  // MULTI_VAL_INC_DEC_CC
             protocol::midi::messageType_t::NOTE_ON,                         // NOTE_OFF_ONLY
             protocol::midi::messageType_t::CONTROL_CHANGE,                  // CONTROL_CHANGE0_ONLY
-            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
             protocol::midi::messageType_t::INVALID,                         // BANK_SELECT_PROGRAM_CHANGE
             protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_INC
             protocol::midi::messageType_t::INVALID,                         // PROGRAM_CHANGE_OFFSET_DEC
             protocol::midi::messageType_t::INVALID,                         // BPM_INC
             protocol::midi::messageType_t::INVALID,                         // BPM_DEC
+            protocol::midi::messageType_t::MMC_PLAY,                        // MMC_PLAY_STOP - modified to stop when needed
             protocol::midi::messageType_t::INVALID,                         // NOTE_LEGATO
+            protocol::midi::messageType_t::SYS_EX,                          // CUSTOM_SYS_EX
         };
 
         Hwa&      _hwa;

@@ -20,8 +20,6 @@ limitations under the License.
 
 #include "deps.h"
 
-#include <gmock/gmock.h>
-
 namespace io::analog
 {
     class HwaStub : public Hwa

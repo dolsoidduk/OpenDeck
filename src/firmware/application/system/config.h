@@ -69,6 +69,15 @@ namespace sys
                 VALUE,
                 CHANNEL,
                 SAX_REGISTER_KEY_MAP,
+                SYSEX_LENGTH,
+                SYSEX_DATA_0,
+                SYSEX_DATA_1,
+                SYSEX_DATA_2,
+                SYSEX_DATA_3,
+                SYSEX_DATA_4,
+                SYSEX_DATA_5,
+                SYSEX_DATA_6,
+                SYSEX_DATA_7,
                 AMOUNT
             };
 

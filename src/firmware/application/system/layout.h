@@ -91,6 +91,65 @@ namespace sys
                 io::buttons::Collection::SIZE(),
                 1,
                 17,
+            },
+
+            // sax register key map section
+            // 0 = identity; otherwise mappedIndex+1 (exact interpretation is feature-specific)
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                127,
+            },
+
+            // custom sysex length (payload bytes between F0 and F7)
+            // total message length is payload+2 and is limited to 16 bytes
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                14,
+            },
+
+            // custom sysex data words (packed 2x7-bit bytes -> 14-bit value)
+            // word = b0 | (b1 << 7)
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                0,
+                16383,
             }
         };
 

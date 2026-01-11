@@ -3,23 +3,37 @@ if(NOT "PROJECT_TARGET_USB_OVER_SERIAL_HOST" IN_LIST PROJECT_TARGET_DEFINES)
     add_executable(application)
     list(APPEND FIRMWARE_TARGETS application)
 
+    # Prefer semantic version tags (vX.Y.Z). Some workflows also create non-semver tags
+    # (e.g., timestamps) which would break parsing and may overflow version fields.
     execute_process(
-        COMMAND sh "-c" "git describe --tags --abbrev=0 | cut -c 2- | cut -d. -f1"
+        COMMAND sh "-c" "git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null | sed 's/^v//' | cut -d. -f1"
         OUTPUT_VARIABLE SW_VERSION_MAJOR
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
     execute_process(
-        COMMAND sh "-c" "git describe --tags --abbrev=0 | cut -c 2- | cut -d. -f2"
+        COMMAND sh "-c" "git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null | sed 's/^v//' | cut -d. -f2"
         OUTPUT_VARIABLE SW_VERSION_MINOR
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
 
     execute_process(
-        COMMAND sh "-c" "git describe --tags --abbrev=0 | cut -c 2- | cut -d. -f3"
+        COMMAND sh "-c" "git describe --tags --abbrev=0 --match 'v[0-9]*' 2>/dev/null | sed 's/^v//' | cut -d. -f3"
         OUTPUT_VARIABLE SW_VERSION_REVISION
         OUTPUT_STRIP_TRAILING_WHITESPACE
     )
+
+    if (SW_VERSION_MAJOR STREQUAL "")
+        set(SW_VERSION_MAJOR 0)
+    endif()
+
+    if (SW_VERSION_MINOR STREQUAL "")
+        set(SW_VERSION_MINOR 0)
+    endif()
+
+    if (SW_VERSION_REVISION STREQUAL "")
+        set(SW_VERSION_REVISION 0)
+    endif()
 
     target_include_directories(application
         PRIVATE
@@ -33,6 +47,7 @@ if(NOT "PROJECT_TARGET_USB_OVER_SERIAL_HOST" IN_LIST PROJECT_TARGET_DEFINES)
         SW_VERSION_MINOR=${SW_VERSION_MINOR}
         SW_VERSION_REVISION=${SW_VERSION_REVISION}
         U8X8_WITH_USER_PTR
+        $<$<CONFIG:Debug>:OPENDECK_DEBUG_SYSEX_TRACE>
     )
 
     file(GLOB_RECURSE APP_GENERATED_SOURCES

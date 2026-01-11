@@ -286,8 +286,6 @@ void Display::displayWelcomeMessage()
         startRow++;
         writeString(startRow, "HW: %s", Strings::TARGET_NAME_STRING);
     }
-
-    core::mcu::timing::waitMs(2000);
 }
 
 std::optional<uint8_t> Display::sysConfigGet(sys::Config::Section::i2c_t section, size_t index, uint16_t& value)

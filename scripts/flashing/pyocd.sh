@@ -9,6 +9,14 @@ target=$1
 target_config=$project_root/config/target/$target.yml
 mcu=$($yaml_parser "$target_config" mcu)
 
+# pyOCD target names don't always match our MCU IDs exactly.
+# Provide minimal aliases for common variants.
+case "$mcu" in
+    stm32f401ce)
+        mcu="stm32f401xe"
+        ;;
+esac
+
 if [[ -n $PROBE_ID ]]
 then
     pyocd load -u "${PROBE_ID}" -t "$mcu" "$PWD"/merged.hex

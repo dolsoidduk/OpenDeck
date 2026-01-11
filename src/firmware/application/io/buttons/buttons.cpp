@@ -24,6 +24,7 @@ limitations under the License.
 #include "application/global/bpm.h"
 #include "application/util/conversion/conversion.h"
 #include "application/util/configurable/configurable.h"
+#include "application/util/logger/logger.h"
 
 #include "core/mcu.h"
 #include "core/util/util.h"
@@ -747,6 +748,119 @@ void Buttons::sendMessage(size_t index, bool state, Descriptor& descriptor)
 
             // We've already dispatched all MIDI events.
             send = false;
+        }
+        break;
+
+        case messageType_t::CUSTOM_SYS_EX:
+        {
+            // SysExConf transports values as 7-bit safe bytes, and the config protocol supports 14-bit values.
+            // Store only payload bytes between F0 and F7 (each must be 0..0x7F), packed 2 bytes -> 14-bit word:
+            // packed = b0 | (b1 << 7)
+            static constexpr uint8_t MAX_TOTAL_LEN    = 16; // includes F0 and F7
+            static constexpr uint8_t MAX_PAYLOAD_LEN  = MAX_TOTAL_LEN - 2;
+            static constexpr uint8_t CUSTOM_SYSEX_WORDS = MAX_TOTAL_LEN / 2; // keep 8 words in DB
+
+            const uint8_t payloadLen = static_cast<uint8_t>(
+                _database.read(database::Config::Section::button_t::SYSEX_LENGTH, index));
+
+            if (payloadLen == 0 || payloadLen > MAX_PAYLOAD_LEN)
+            {
+                send = false;
+                break;
+            }
+
+            uint8_t payloadBuf[MAX_PAYLOAD_LEN] = {};
+
+            for (uint8_t wordIndex = 0; wordIndex < CUSTOM_SYSEX_WORDS; wordIndex++)
+            {
+                const auto section = static_cast<database::Config::Section::button_t>(
+                    static_cast<uint8_t>(database::Config::Section::button_t::SYSEX_DATA_0) + wordIndex);
+
+                const uint16_t word = static_cast<uint16_t>(_database.read(section, index));
+
+                const uint8_t b0 = static_cast<uint8_t>(word & 0x7F);
+                const uint8_t b1 = static_cast<uint8_t>((word >> 7) & 0x7F);
+
+                const uint8_t outIndex0 = static_cast<uint8_t>(2 * wordIndex);
+                const uint8_t outIndex1 = static_cast<uint8_t>(2 * wordIndex + 1);
+
+                if (outIndex0 < MAX_PAYLOAD_LEN)
+                {
+                    payloadBuf[outIndex0] = b0;
+                }
+                if (outIndex1 < MAX_PAYLOAD_LEN)
+                {
+                    payloadBuf[outIndex1] = b1;
+                }
+            }
+
+            uint8_t sysExBuf[MAX_TOTAL_LEN] = {};
+            const uint8_t length = static_cast<uint8_t>(payloadLen + 2);
+
+            sysExBuf[0] = 0xF0;
+            for (uint8_t i = 0; i < payloadLen; i++)
+            {
+                sysExBuf[1 + i] = payloadBuf[i];
+            }
+            sysExBuf[1 + payloadLen] = 0xF7;
+
+            const uint8_t varPos   = static_cast<uint8_t>(descriptor.event.index & 0xFF);
+            const uint8_t varValue = static_cast<uint8_t>(descriptor.event.value & 0x7F);
+
+            // Variable substitution is optional.
+            // Treat index 0 as 'disabled' so default config doesn't corrupt the leading 0xF0.
+            // Note: varPos uses full-message indexing (including F0 at index 0).
+            if (varPos != 0 && varPos < (length - 1))
+            {
+                sysExBuf[varPos] = varValue;
+            }
+
+#ifdef OPENDECK_DEBUG_SYSEX_TRACE
+            // Debug trace (visible in any MIDI monitor).
+            // Sends a non-commercial SysEx (0x7D) that encodes the first bytes as nibbles (7-bit safe).
+            // Format:
+            // F0 7D 'O' 'D' 01 <btnIdx> <len> <varPos> <varVal> <hi/lo nibbles...> F7
+            {
+                uint8_t traceBuf[64] = {};
+                uint8_t traceLen     = 0;
+
+                traceBuf[traceLen++] = 0xF0;
+                traceBuf[traceLen++] = 0x7D;
+                traceBuf[traceLen++] = 0x4F;    // 'O'
+                traceBuf[traceLen++] = 0x44;    // 'D'
+                traceBuf[traceLen++] = 0x01;    // version
+                traceBuf[traceLen++] = static_cast<uint8_t>(index & 0x7F);
+                traceBuf[traceLen++] = static_cast<uint8_t>(length & 0x7F);
+                traceBuf[traceLen++] = static_cast<uint8_t>(varPos & 0x7F);
+                traceBuf[traceLen++] = static_cast<uint8_t>(varValue & 0x7F);
+
+                const uint8_t traceBytes = (length < 8) ? length : 8;
+                for (uint8_t i = 0; i < traceBytes; i++)
+                {
+                    traceBuf[traceLen++] = static_cast<uint8_t>((sysExBuf[i] >> 4) & 0x0F);
+                    traceBuf[traceLen++] = static_cast<uint8_t>(sysExBuf[i] & 0x0F);
+                }
+
+                traceBuf[traceLen++] = 0xF7;
+
+                auto traceEvent       = descriptor.event;
+                traceEvent.sysEx      = traceBuf;
+                traceEvent.sysExLength = traceLen;
+                traceEvent.message    = midi::messageType_t::SYS_EX;
+
+                MidiDispatcher.notify(eventType, traceEvent);
+
+                LOG_INF("Custom SysEx trace: btn=%d len=%d varPos=%d varVal=%d",
+                        static_cast<int>(index),
+                        static_cast<int>(length),
+                        static_cast<int>(varPos),
+                        static_cast<int>(varValue));
+            }
+#endif
+
+            descriptor.event.sysEx       = sysExBuf;
+            descriptor.event.sysExLength = length;
+            descriptor.event.message     = midi::messageType_t::SYS_EX;
         }
         break;
 

@@ -42,11 +42,10 @@ bool Nextion::init()
 
     if (_hwa.init())
     {
-        // add slight delay to ensure display can receive commands after power on
-        core::mcu::timing::waitMs(1000);
-
-        endCommand();
-        writeCommand("sendxy=1");
+        // Avoid blocking delays during system boot: USB servicing happens in board::update()
+        // which starts only after System::init() returns.
+        _postInitPending   = true;
+        _postInitReadyAtMs = core::mcu::timing::ms() + 1000;
 
         return true;
     }
@@ -56,16 +55,31 @@ bool Nextion::init()
 
 bool Nextion::deInit()
 {
+    _postInitPending        = false;
+    _postInitReadyAtMs      = 0;
+    _pendingScreenValid     = false;
+    _pendingBrightnessValid = false;
     return _hwa.deInit();
 }
 
 bool Nextion::setScreen(size_t index)
 {
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        _pendingScreenValid = true;
+        _pendingScreenIndex = index;
+        return true;
+    }
+
     return writeCommand("page %u", index);
 }
 
 tsEvent_t Nextion::update(Data& data)
 {
+    maybeFinishPostInit();
+
     uint8_t value   = 0;
     bool    process = false;
     auto    retVal  = tsEvent_t::NONE;
@@ -106,6 +120,13 @@ tsEvent_t Nextion::update(Data& data)
 
 void Nextion::setIconState(Icon& icon, bool state)
 {
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        return;
+    }
+
     // ignore width/height zero - set either intentionally to avoid display or incorrectly
     if (!icon.width)
     {
@@ -160,7 +181,47 @@ bool Nextion::endCommand()
 
 bool Nextion::setBrightness(brightness_t brightness)
 {
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        _pendingBrightnessValid = true;
+        _pendingBrightness      = brightness;
+        return true;
+    }
+
     return writeCommand("dims=%d", BRIGHTNESS_MAPPING[static_cast<uint8_t>(brightness)]);
+}
+
+void Nextion::maybeFinishPostInit()
+{
+    if (!_postInitPending)
+    {
+        return;
+    }
+
+    if (core::mcu::timing::ms() < _postInitReadyAtMs)
+    {
+        return;
+    }
+
+    // Mark as ready before sending any commands to avoid recursion via writeCommand().
+    _postInitPending = false;
+
+    endCommand();
+    writeCommand("sendxy=1");
+
+    if (_pendingScreenValid)
+    {
+        writeCommand("page %u", _pendingScreenIndex);
+        _pendingScreenValid = false;
+    }
+
+    if (_pendingBrightnessValid)
+    {
+        writeCommand("dims=%d", BRIGHTNESS_MAPPING[static_cast<uint8_t>(_pendingBrightness)]);
+        _pendingBrightnessValid = false;
+    }
 }
 
 tsEvent_t Nextion::response(Data& data)

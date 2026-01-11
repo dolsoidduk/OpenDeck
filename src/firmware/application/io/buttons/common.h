@@ -86,6 +86,7 @@ namespace io::buttons
         BPM_DEC,                           ///< Decrement BPM
         MMC_PLAY_STOP,                     ///< MMC Play/Stop toggle
         NOTE_LEGATO,                       ///< Legato note (no Note Off)
+        CUSTOM_SYS_EX,                     ///< Custom SysEx (user-defined) message
         AMOUNT                             ///< Total number of message types
     };
 }    // namespace io::buttons

@@ -39,8 +39,10 @@ bool Viewtech::init()
 
     if (_hwa.init())
     {
-        // add slight delay to ensure display can receive commands after power on
-        core::mcu::timing::waitMs(3000);
+        // Avoid blocking delays during system boot: USB servicing happens in board::update()
+        // which starts only after System::init() returns.
+        _postInitPending   = true;
+        _postInitReadyAtMs = core::mcu::timing::ms() + 3000;
 
         return true;
     }
@@ -50,6 +52,10 @@ bool Viewtech::init()
 
 bool Viewtech::deInit()
 {
+    _postInitPending        = false;
+    _postInitReadyAtMs      = 0;
+    _pendingScreenValid     = false;
+    _pendingBrightnessValid = false;
     return _hwa.deInit();
 }
 
@@ -57,19 +63,24 @@ bool Viewtech::setScreen(size_t index)
 {
     index &= 0xFF;
 
-    _hwa.write(0xA5);
-    _hwa.write(0x5A);
-    _hwa.write(0x04);
-    _hwa.write(0x80);
-    _hwa.write(0x03);
-    _hwa.write(0x00);
-    _hwa.write(index);
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        _pendingScreenValid = true;
+        _pendingScreenIndex = index;
+        return true;
+    }
+
+    sendScreen(index);
 
     return true;
 }
 
 tsEvent_t Viewtech::update(Data& data)
 {
+    maybeFinishPostInit();
+
     auto    event = tsEvent_t::NONE;
     uint8_t value = 0;
 
@@ -140,6 +151,13 @@ tsEvent_t Viewtech::update(Data& data)
 
 void Viewtech::setIconState(Icon& icon, bool state)
 {
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        return;
+    }
+
     // header
     _hwa.write(0xA5);
     _hwa.write(0x5A);
@@ -162,6 +180,62 @@ void Viewtech::setIconState(Icon& icon, bool state)
 
 bool Viewtech::setBrightness(brightness_t brightness)
 {
+    maybeFinishPostInit();
+
+    if (_postInitPending)
+    {
+        _pendingBrightnessValid = true;
+        _pendingBrightness      = brightness;
+        return true;
+    }
+
+    sendBrightness(brightness);
+
+    return true;
+}
+
+void Viewtech::maybeFinishPostInit()
+{
+    if (!_postInitPending)
+    {
+        return;
+    }
+
+    if (core::mcu::timing::ms() < _postInitReadyAtMs)
+    {
+        return;
+    }
+
+    _postInitPending = false;
+
+    if (_pendingScreenValid)
+    {
+        sendScreen(_pendingScreenIndex);
+        _pendingScreenValid = false;
+    }
+
+    if (_pendingBrightnessValid)
+    {
+        sendBrightness(_pendingBrightness);
+        _pendingBrightnessValid = false;
+    }
+}
+
+void Viewtech::sendScreen(size_t index)
+{
+    index &= 0xFF;
+
+    _hwa.write(0xA5);
+    _hwa.write(0x5A);
+    _hwa.write(0x04);
+    _hwa.write(0x80);
+    _hwa.write(0x03);
+    _hwa.write(0x00);
+    _hwa.write(index);
+}
+
+void Viewtech::sendBrightness(brightness_t brightness)
+{
     // header
     _hwa.write(0xA5);
     _hwa.write(0x5A);
@@ -177,8 +251,7 @@ bool Viewtech::setBrightness(brightness_t brightness)
 
     // brightness value
     _hwa.write(BRIGHTNESS_MAPPING[static_cast<uint8_t>(brightness)]);
-
-    return true;
 }
+
 
 #endif

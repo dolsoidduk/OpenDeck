@@ -150,6 +150,73 @@ namespace database
                 lib::lessdb::autoIncrementSetting_t::DISABLE,
                 0,
             },
+
+            // custom sysex length (payload bytes between F0 and F7)
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::BYTE,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+
+            // custom sysex data words (packed 2x7-bit bytes -> 14-bit value)
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
+            {
+                io::buttons::Collection::SIZE(),
+                lib::lessdb::sectionParameterType_t::WORD,
+                lib::lessdb::preserveSetting_t::DISABLE,
+                lib::lessdb::autoIncrementSetting_t::DISABLE,
+                0,
+            },
         };
 
         std::vector<lib::lessdb::Section> _encoderSections = {

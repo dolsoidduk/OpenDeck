@@ -87,7 +87,16 @@ namespace util
             database::Config::Section::button_t::MIDI_ID,
             database::Config::Section::button_t::VALUE,
             database::Config::Section::button_t::CHANNEL,
-            database::Config::Section::button_t::SAX_REGISTER_KEY_MAP
+            database::Config::Section::button_t::SAX_REGISTER_KEY_MAP,
+            database::Config::Section::button_t::SYSEX_LENGTH,
+            database::Config::Section::button_t::SYSEX_DATA_0,
+            database::Config::Section::button_t::SYSEX_DATA_1,
+            database::Config::Section::button_t::SYSEX_DATA_2,
+            database::Config::Section::button_t::SYSEX_DATA_3,
+            database::Config::Section::button_t::SYSEX_DATA_4,
+            database::Config::Section::button_t::SYSEX_DATA_5,
+            database::Config::Section::button_t::SYSEX_DATA_6,
+            database::Config::Section::button_t::SYSEX_DATA_7,
         };
 
         static constexpr database::Config::Section::encoder_t SYS_EX2_DB_ENCODER[static_cast<uint8_t>(sys::Config::Section::encoder_t::AMOUNT)] = {
