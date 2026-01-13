@@ -139,17 +139,19 @@ namespace io::encoders
         /// Time difference betweeen multiple encoder readouts in milliseconds.
         const uint32_t TIME_DIFF_READOUT;
 
+        static constexpr size_t ARRAY_SIZE = Collection::SIZE() ? Collection::SIZE() : 1;
+
         /// Holds current value for all encoders.
-        int16_t _value[Collection::SIZE()] = { 0 };
+        int16_t _value[ARRAY_SIZE] = { 0 };
 
         /// Array holding current speed (in steps) for all encoders.
-        uint8_t _encoderSpeed[Collection::SIZE()] = {};
+        uint8_t _encoderSpeed[ARRAY_SIZE] = {};
 
         /// Array holding last two readings from encoder pins.
-        uint8_t _encoderData[Collection::SIZE()] = {};
+        uint8_t _encoderData[ARRAY_SIZE] = {};
 
         /// Array holding current amount of pulses for all encoders.
-        int8_t _encoderPulses[Collection::SIZE()] = {};
+        int8_t _encoderPulses[ARRAY_SIZE] = {};
 
         void                   fillDescriptor(size_t index, position_t position, Descriptor& descriptor);
         position_t             read(size_t index, uint8_t pairState);
