@@ -637,6 +637,7 @@ std::optional<uint8_t> System::sysConfigGet(sys::Config::Section::global_t secti
         case static_cast<size_t>(sys::Config::systemSetting_t::ENABLE_PRESET_CHANGE_WITH_PROGRAM_CHANGE_IN):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_TRANSPOSE):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC):
@@ -711,6 +712,14 @@ std::optional<uint8_t> System::sysConfigSet(sys::Config::Section::global_t secti
 
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE):
             if (value > 127)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_TRANSPOSE):
+            // 0..48 where 24 == 0 semitones
+            if (value > 48)
             {
                 return sys::Config::Status::ERROR_NEW_VALUE;
             }

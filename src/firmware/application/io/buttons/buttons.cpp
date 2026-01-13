@@ -269,6 +269,12 @@ void Buttons::processSaxRegisterChromatic()
         _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
                        sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE));
 
+    // 0..48 where 24 == 0 semitones
+    const uint16_t transposeRaw = static_cast<uint16_t>(
+        _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                       sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_TRANSPOSE));
+    const int16_t transpose = static_cast<int16_t>(transposeRaw) - 24;
+
     const bool invertInputs = _database.read(
         database::Config::Section::system_t::SYSTEM_SETTINGS,
         sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT);
@@ -400,7 +406,17 @@ void Buttons::processSaxRegisterChromatic()
             return;
         }
 
-        const uint8_t newNote = bestNote;
+        int16_t noteWide = static_cast<int16_t>(bestNote) + transpose;
+        if (noteWide < 0)
+        {
+            noteWide = 0;
+        }
+        else if (noteWide > 127)
+        {
+            noteWide = 127;
+        }
+
+        const uint8_t newNote = static_cast<uint8_t>(noteWide);
 
         if (_saxNoteOn && _saxActiveNote == newNote)
         {
@@ -464,8 +480,12 @@ void Buttons::processSaxRegisterChromatic()
         mappedKey = static_cast<uint16_t>(activeKey);
     }
 
-    uint16_t noteWide = static_cast<uint16_t>(base) + mappedKey;
-    if (noteWide > 127)
+    int16_t noteWide = static_cast<int16_t>(base) + static_cast<int16_t>(mappedKey) + transpose;
+    if (noteWide < 0)
+    {
+        noteWide = 0;
+    }
+    else if (noteWide > 127)
     {
         noteWide = 127;
     }
