@@ -31,6 +31,7 @@ namespace database
         static constexpr size_t MAX_PRESETS                = 10;
         static constexpr size_t MAX_CUSTOM_SYSTEM_SETTINGS = 10;
         static constexpr size_t SAX_FINGERING_TABLE_ENTRIES = 128;
+        static constexpr size_t SAX_FINGERING_KEYS          = 26;
 
         enum class block_t : uint8_t
         {

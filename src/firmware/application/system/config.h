@@ -58,6 +58,10 @@ namespace sys
                 SAX_FINGERING_MASK_LO14,
                 SAX_FINGERING_MASK_HI10_ENABLE,
                 SAX_FINGERING_NOTE,
+                /// Write-only helper: capture current pressed keys into fingering table entry.
+                /// index = entry (0..SAX_FINGERING_TABLE_ENTRIES-1)
+                /// value = note (0..127) to also set note, or >=128 to keep existing note
+                SAX_FINGERING_CAPTURE,
                 AMOUNT
             };
 
@@ -157,6 +161,9 @@ namespace sys
             // When enabled, logical pressed state is inverted for sax register chromatic processing.
             // Useful for active-low sensors (e.g. open-drain Hall switches).
             SAX_REGISTER_CHROMATIC_INPUT_INVERT = static_cast<uint8_t>(database::Config::systemSetting_t::CUSTOM_SYSTEM_SETTING_START) + 7,
+            // MPXV7002DP breath sensor output is centered around Vcc/2 at zero pressure.
+            // This setting allows tuning that midpoint as a percentage of full ADC scale.
+            SAX_BREATH_CONTROLLER_MID_PERCENT = static_cast<uint8_t>(database::Config::systemSetting_t::CUSTOM_SYSTEM_SETTING_START) + 8,
             AMOUNT
         };
 

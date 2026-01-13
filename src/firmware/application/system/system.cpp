@@ -23,6 +23,10 @@ limitations under the License.
 #include "application/global/midi_program.h"
 #include "bootloader/fw_selector/fw_selector.h"
 
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+#include "application/io/buttons/buttons.h"
+#endif
+
 #include "core/mcu.h"
 #include "core/util/util.h"
 
@@ -637,6 +641,7 @@ std::optional<uint8_t> System::sysConfigGet(sys::Config::Section::global_t secti
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC):
         case static_cast<size_t>(sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT):
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_MID_PERCENT):
             break;
 
         default:
@@ -670,6 +675,18 @@ std::optional<uint8_t> System::sysConfigGet(sys::Config::Section::global_t secti
 
         value = readValue;
         return result;
+    }
+
+    if (section == sys::Config::Section::global_t::SAX_FINGERING_CAPTURE)
+    {
+        if (index >= database::Config::SAX_FINGERING_TABLE_ENTRIES)
+        {
+            return sys::Config::Status::ERROR_INDEX;
+        }
+
+        // write-only section; report 0 on reads
+        value = 0;
+        return sys::Config::Status::ACK;
     }
 
     return std::nullopt;
@@ -726,6 +743,14 @@ std::optional<uint8_t> System::sysConfigSet(sys::Config::Section::global_t secti
             }
             break;
 
+        case static_cast<size_t>(sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_MID_PERCENT):
+            // 0..100 (% of full ADC scale)
+            if (value > 100)
+            {
+                return sys::Config::Status::ERROR_NEW_VALUE;
+            }
+            break;
+
         default:
             return std::nullopt;
         }
@@ -755,8 +780,9 @@ std::optional<uint8_t> System::sysConfigSet(sys::Config::Section::global_t secti
         }
         else if (section == sys::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE)
         {
-            // 10 bits mask high + enable bit10
-            if (value > 2047)
+            // High mask bits + enable bit.
+            // For 26 keys: 12 bits high + enable bit12 => 0..8191
+            if (value > 8191)
             {
                 return sys::Config::Status::ERROR_NEW_VALUE;
             }
@@ -774,6 +800,32 @@ std::optional<uint8_t> System::sysConfigSet(sys::Config::Section::global_t secti
                           : sys::Config::Status::ERROR_WRITE;
 
         return result;
+    }
+
+    if (section == sys::Config::Section::global_t::SAX_FINGERING_CAPTURE)
+    {
+        if (index >= database::Config::SAX_FINGERING_TABLE_ENTRIES)
+        {
+            return sys::Config::Status::ERROR_INDEX;
+        }
+
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+        auto component = _components.io().at(static_cast<size_t>(ioComponent_t::BUTTONS));
+    if (component == nullptr)
+        {
+            return sys::Config::Status::ERROR_WRITE;
+        }
+
+    // RTTI is disabled (-fno-rtti), so dynamic_cast cannot be used here.
+    // For PROJECT_TARGET_SAX_REGISTER_CHROMATIC, BUTTONS component is expected to be io::buttons::Buttons.
+    auto buttons = static_cast<io::buttons::Buttons*>(component);
+
+        const bool ok = buttons->captureSaxFingeringTableEntry(index, value);
+        return ok ? sys::Config::Status::ACK : sys::Config::Status::ERROR_WRITE;
+#else
+        (void) value;
+        return sys::Config::Status::ERROR_WRITE;
+#endif
     }
 
     return std::nullopt;

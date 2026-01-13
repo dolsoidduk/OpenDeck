@@ -44,6 +44,8 @@ void Admin::customInitGlobal()
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE, 0);
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX, 7);
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC, 2);
+    // 50% = ADC mid-scale (Vcc/2) for zero pressure
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_MID_PERCENT, 50);
 #endif
 }
 

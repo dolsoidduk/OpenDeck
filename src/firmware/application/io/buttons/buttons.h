@@ -45,6 +45,12 @@ namespace io::buttons
         size_t maxComponentUpdateIndex() override;
         void   reset(size_t index);
 
+    #ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+        /// Capture current pressed keys into a fingering table entry.
+        /// noteValue: 0..127 to also set note, >=128 to keep existing note.
+        bool captureSaxFingeringTableEntry(size_t entryIndex, uint16_t noteValue);
+    #endif
+
         private:
         struct Descriptor
         {

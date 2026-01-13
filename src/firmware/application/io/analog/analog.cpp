@@ -139,7 +139,9 @@ void Analog::processSaxBreathController(size_t index, uint16_t value)
 
     const uint8_t bits      = _hwa.adcBits();
     const uint32_t maxAdc   = (bits >= 31) ? 0x7FFFFFFFu : ((1u << bits) - 1u);
-    const uint32_t mid      = maxAdc / 2u;
+    const uint32_t midPercent = _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                                               sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_MID_PERCENT);
+    const uint32_t mid        = (midPercent >= 100u) ? maxAdc : (maxAdc * midPercent) / 100u;
     const uint32_t raw      = value;
     const uint32_t delta    = (raw > mid) ? (raw - mid) : 0u;
     const uint32_t span     = (maxAdc > mid) ? (maxAdc - mid) : 1u;
