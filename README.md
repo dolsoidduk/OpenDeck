@@ -115,6 +115,12 @@ Common targets include:
 * Other supported boards: `discovery`, `stm32f4ve`, `ws_core405r`, `ws_core407i`, `ws_core407v`, `tpyboard`, `teensy2pp`
 * Project-specific targets in this fork: `midisaxo`, `bergamot`, `rooibos`, `dubfocus12`, `dubfocus12sr`, `dubfocus16c`, `dubfocus16t`
 
+#### Recommended (Midisaxo)
+
+* `midisaxo` (MCU: RP2040) is the primary target for this fork.
+  * Start with an RP2040 board (for example Raspberry Pi Pico) wired to match the pin mapping in `config/target/midisaxo.yml`.
+  * If you are using a different RP2040 board/pinout, create a new target YAML based on `midisaxo.yml`.
+
 Build any target with:
 
 * `make TARGET=<target> -j`
