@@ -13,3 +13,6 @@ build/
 ccache/*
 release/*
 .west-updated
+
+# UI lives as a separate git repository under this folder.
+opendeckui/
