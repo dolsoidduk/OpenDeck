@@ -101,6 +101,26 @@ The firmware supports various other boards, both small and large:
 
 [1] WeAct (developer of Black Pill boards) currently sells Black Pill board with AT32F403ACGU7 MCU instead of STM32F411. **This variant isn't supported!**
 
+### Build targets (boards) in this repository
+
+This repository defines buildable board variants as YAML target descriptors in `config/target/*.yml`.
+
+Common targets include:
+
+* OpenDeck official boards: `opendeck2`, `opendeck21`, `opendeck22`, `opendeck31`, `opendeck3a`, `opendeck3b`, `opendeck_mini`
+* STM32 BlackPill: `blackpill401cc`, `blackpill401ce`, `blackpill411`
+* Nordic / BLE: `nrf52840dk`, `af_ib_nrf52840`, `xiao_nrf52840`
+* RP2040: `pico`, `rp2040zero`, `xiao_rp2040`
+* Arduino: `mega2560`, `mega2560_muxsh2`, `mega16u2`, `nano33ble`
+* Other supported boards: `discovery`, `stm32f4ve`, `ws_core405r`, `ws_core407i`, `ws_core407v`, `tpyboard`, `teensy2pp`
+* Project-specific targets in this fork: `midisaxo`, `bergamot`, `rooibos`, `dubfocus12`, `dubfocus12sr`, `dubfocus16c`, `dubfocus16t`
+
+Build any target with:
+
+* `make TARGET=<target> -j`
+
+For the full list, see the filenames in `config/target/`.
+
 *Some of the supported boards*
 
 ![](https://github.com/shanteacontrols/OpenDeck/wiki/img/boards.jpg)
