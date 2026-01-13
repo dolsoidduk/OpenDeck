@@ -270,13 +270,19 @@ void Buttons::processSaxRegisterChromatic()
         _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
                        sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE));
 
+    // 0..48 where 24 == 0 semitones
+    const uint16_t transposeRaw = static_cast<uint16_t>(
+        _database.read(database::Config::Section::system_t::SYSTEM_SETTINGS,
+                       sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_TRANSPOSE));
+    const int16_t transpose = static_cast<int16_t>(transposeRaw) - 24;
+
     const bool invertInputs = _database.read(
         database::Config::Section::system_t::SYSTEM_SETTINGS,
         sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT);
 
     int32_t    activeKey    = -1;
     const auto digitalCount = Collection::SIZE(GROUP_DIGITAL_INPUTS);
-    const auto saxKeyCount  = (digitalCount < 24U) ? digitalCount : 24U;
+    const auto saxKeyCount  = (digitalCount < database::Config::SAX_FINGERING_KEYS) ? digitalCount : database::Config::SAX_FINGERING_KEYS;
 
     const auto saxPressed = [this, invertInputs](size_t index)
     {
@@ -296,7 +302,7 @@ void Buttons::processSaxRegisterChromatic()
 
     const uint8_t channel = saxChannel();
 
-    // Build current fingering mask from first 24 digital keys.
+    // Build current fingering mask from first N digital keys.
     uint32_t currentMask = 0;
     for (size_t i = 0; i < saxKeyCount; i++)
     {
@@ -328,7 +334,11 @@ void Buttons::processSaxRegisterChromatic()
         const uint16_t hiEn = static_cast<uint16_t>(
             _database.read(database::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE, entry));
 
-        const bool enabled = (hiEn & (1U << 10)) != 0;
+        constexpr uint8_t HI_BITS = static_cast<uint8_t>(database::Config::SAX_FINGERING_KEYS - 14);
+        constexpr uint16_t HI_MASK = static_cast<uint16_t>((1U << HI_BITS) - 1U);
+        constexpr uint16_t ENABLE_MASK = static_cast<uint16_t>(1U << HI_BITS);
+
+        const bool enabled = (hiEn & ENABLE_MASK) != 0;
         if (!enabled)
         {
             continue;
@@ -339,18 +349,20 @@ void Buttons::processSaxRegisterChromatic()
         const uint16_t lo14 = static_cast<uint16_t>(
             _database.read(database::Config::Section::global_t::SAX_FINGERING_MASK_LO14, entry));
 
-        const uint16_t hi10 = static_cast<uint16_t>(hiEn & 0x03FF);
-        uint32_t       mask = static_cast<uint32_t>(lo14) | (static_cast<uint32_t>(hi10) << 14);
+        const uint16_t hi = static_cast<uint16_t>(hiEn & HI_MASK);
+        uint32_t       mask = static_cast<uint32_t>(lo14) | (static_cast<uint32_t>(hi) << 14);
 
-        // ignore bits outside of 24 keys
-        if (saxKeyCount < 24U)
+        // ignore bits outside of active key count
+        if (saxKeyCount < database::Config::SAX_FINGERING_KEYS)
         {
             const uint32_t allowedMask = (saxKeyCount == 0U) ? 0U : ((1UL << saxKeyCount) - 1UL);
             mask &= allowedMask;
         }
         else
         {
-            mask &= 0x00FFFFFFUL;
+            mask &= (database::Config::SAX_FINGERING_KEYS >= 32U)
+                        ? 0xFFFFFFFFUL
+                        : ((1UL << database::Config::SAX_FINGERING_KEYS) - 1UL);
         }
 
         if ((mask & currentMask) != mask)
@@ -395,7 +407,17 @@ void Buttons::processSaxRegisterChromatic()
             return;
         }
 
-        const uint8_t newNote = bestNote;
+        int16_t noteWide = static_cast<int16_t>(bestNote) + transpose;
+        if (noteWide < 0)
+        {
+            noteWide = 0;
+        }
+        else if (noteWide > 127)
+        {
+            noteWide = 127;
+        }
+
+        const uint8_t newNote = static_cast<uint8_t>(noteWide);
 
         if (_saxNoteOn && _saxActiveNote == newNote)
         {
@@ -459,8 +481,12 @@ void Buttons::processSaxRegisterChromatic()
         mappedKey = static_cast<uint16_t>(activeKey);
     }
 
-    uint16_t noteWide = static_cast<uint16_t>(base) + mappedKey;
-    if (noteWide > 127)
+    int16_t noteWide = static_cast<int16_t>(base) + static_cast<int16_t>(mappedKey) + transpose;
+    if (noteWide < 0)
+    {
+        noteWide = 0;
+    }
+    else if (noteWide > 127)
     {
         noteWide = 127;
     }
@@ -493,6 +519,55 @@ void Buttons::processSaxRegisterChromatic()
 
     _saxActiveNote = newNote;
     _saxNoteOn     = true;
+}
+
+bool Buttons::captureSaxFingeringTableEntry(size_t entryIndex, uint16_t noteValue)
+{
+    if (entryIndex >= database::Config::SAX_FINGERING_TABLE_ENTRIES)
+    {
+        return false;
+    }
+
+    const auto digitalCount = Collection::SIZE(GROUP_DIGITAL_INPUTS);
+    const auto saxKeyCount  = (digitalCount < database::Config::SAX_FINGERING_KEYS) ? digitalCount : database::Config::SAX_FINGERING_KEYS;
+
+    const bool invertInputs = _database.read(
+        database::Config::Section::system_t::SYSTEM_SETTINGS,
+        sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_INPUT_INVERT);
+
+    const auto saxPressed = [this, invertInputs](size_t index)
+    {
+        const bool pressed = state(index);
+        return invertInputs ? !pressed : pressed;
+    };
+
+    uint32_t currentMask = 0;
+    for (size_t i = 0; i < saxKeyCount; i++)
+    {
+        if (saxPressed(i))
+        {
+            currentMask |= (1UL << i);
+        }
+    }
+
+    constexpr uint8_t  HI_BITS     = static_cast<uint8_t>(database::Config::SAX_FINGERING_KEYS - 14);
+    constexpr uint16_t HI_MASK     = static_cast<uint16_t>((1U << HI_BITS) - 1U);
+    constexpr uint16_t ENABLE_MASK = static_cast<uint16_t>(1U << HI_BITS);
+
+    const uint16_t lo14 = static_cast<uint16_t>(currentMask & 0x3FFFU);
+    const uint16_t hi   = static_cast<uint16_t>((currentMask >> 14U) & HI_MASK);
+    const uint16_t hiEn = static_cast<uint16_t>(hi | ENABLE_MASK);
+
+    bool ok = true;
+    ok &= _database.update(database::Config::Section::global_t::SAX_FINGERING_MASK_LO14, entryIndex, lo14);
+    ok &= _database.update(database::Config::Section::global_t::SAX_FINGERING_MASK_HI10_ENABLE, entryIndex, hiEn);
+
+    if (noteValue <= 127)
+    {
+        ok &= _database.update(database::Config::Section::global_t::SAX_FINGERING_NOTE, entryIndex, noteValue);
+    }
+
+    return ok;
 }
 #endif
 

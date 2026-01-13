@@ -39,11 +39,15 @@ void Admin::customInitGlobal()
     // 60 = C4
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_ENABLE, 1);
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_BASE_NOTE, 60);
+    // 24 = 0 semitones (range -24..+24)
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_REGISTER_CHROMATIC_TRANSPOSE, 24);
 
     // MPXV7002DP breath controller (optional)
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ENABLE, 0);
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_ANALOG_INDEX, 7);
     update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_CC, 2);
+    // 50% = ADC mid-scale (Vcc/2) for zero pressure
+    update(Config::Section::system_t::SYSTEM_SETTINGS, sys::Config::systemSetting_t::SAX_BREATH_CONTROLLER_MID_PERCENT, 50);
 #endif
 }
 

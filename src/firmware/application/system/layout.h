@@ -19,6 +19,7 @@ limitations under the License.
 #pragma once
 
 #include "custom_ids.h"
+#include "application/database/config.h"
 #include "application/io/buttons/common.h"
 #include "application/io/encoders/common.h"
 #include "application/io/analog/common.h"
@@ -55,6 +56,34 @@ namespace sys
                 0,
                 0,
             },
+
+#ifdef PROJECT_TARGET_SAX_REGISTER_CHROMATIC
+            // Sax fingering table sections (24 keys): used to map pressed-key masks to notes.
+            {
+                static_cast<uint16_t>(database::Config::SAX_FINGERING_TABLE_ENTRIES),
+                0,
+                16383,
+            },
+
+            {
+                static_cast<uint16_t>(database::Config::SAX_FINGERING_TABLE_ENTRIES),
+                0,
+                8191,
+            },
+
+            {
+                static_cast<uint16_t>(database::Config::SAX_FINGERING_TABLE_ENTRIES),
+                0,
+                127,
+            },
+
+            // Sax fingering capture: write-only command to store current pressed-key mask.
+            {
+                static_cast<uint16_t>(database::Config::SAX_FINGERING_TABLE_ENTRIES),
+                0,
+                16383,
+            },
+#endif
         };
 
         std::vector<lib::sysexconf::Section> _buttonSections = {

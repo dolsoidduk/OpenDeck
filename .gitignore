@@ -14,5 +14,5 @@ ccache/*
 release/*
 .west-updated
 
-# UI workspace is a separate git repo.
+# UI lives as a separate git repository under this folder.
 opendeckui/

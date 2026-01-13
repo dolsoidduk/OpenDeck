@@ -18,6 +18,8 @@ limitations under the License.
 
 #pragma once
 
+#include "application/io/base.h"
+
 #include "deps.h"
 
 namespace io::encoders

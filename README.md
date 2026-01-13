@@ -1,5 +1,12 @@
 # OpenDeck MIDI Platform
 
+> Note: This repository is a fork of https://github.com/shanteacontrols/OpenDeck.
+>
+> Purpose of this fork: keep project-specific patches and experiments used by **midisaxophone** (custom hardware mappings, UI/firmware adjustments, and related tooling).
+>
+> Attribution: all original credit belongs to the upstream OpenDeck authors and contributors.
+> When feasible, improvements are intended to be upstreamed via issues/PRs.
+
 OpenDeck is a platform for building MIDI controllers. It is a firmware running on various boards which transforms them into class-compliant USB MIDI devices, making them compatible with any MIDI software on any operating system. OpenDeck is designed to solve two problems when building a MIDI controller:
 
 * Coding - there is no need to code anything in order to make changes to the controller or to make it work
